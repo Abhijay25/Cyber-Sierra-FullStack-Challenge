@@ -9,3 +9,4 @@ node_modules
 out/
 backend/static/
 backend/.env
+backend/pandasai.log
