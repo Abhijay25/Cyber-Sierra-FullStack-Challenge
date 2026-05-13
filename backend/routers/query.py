@@ -48,7 +48,8 @@ async def query(
     )
     preferences_md = session_row.preferences_md if session_row is not None else ""
 
-    refined_prompt, answer = await run_pipeline(request.question, df, preferences_md)
+    history = [{"question": t.question, "answer": t.answer} for t in request.history]
+    refined_prompt, answer = await run_pipeline(request.question, df, preferences_md, history)
 
     # Persist the prompt record
     prompt_row = Prompt(

@@ -106,10 +106,16 @@ export async function getData(
   })
 }
 
+export interface ConversationTurn {
+  question: string
+  answer: string
+}
+
 export async function querySheet(
   sheetName: string,
   question: string,
   n: number,
+  history: ConversationTurn[] = [],
 ): Promise<QueryResponse> {
   return jsonFetch<QueryResponse>('/api/query', {
     method: 'POST',
@@ -117,6 +123,7 @@ export async function querySheet(
       sheet_name: sheetName,
       question: question,
       n,
+      history,
     }),
   })
 }

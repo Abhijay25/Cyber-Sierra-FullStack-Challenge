@@ -58,6 +58,20 @@ export default function Home() {
                 }}
               />
             </label>
+            <button
+              onClick={() => setHistoryOpen(true)}
+              style={{
+                padding: '7px 14px',
+                border: '1px solid #ccc',
+                borderRadius: 6,
+                background: '#fff',
+                fontSize: 14,
+                cursor: 'pointer',
+                color: '#444',
+              }}
+            >
+              📋 History
+            </button>
             <FileUpload
               onUpload={handleUpload}
               isUploading={isUploading}
@@ -84,7 +98,6 @@ export default function Home() {
             <QueryInterface
               sheetName={activeSheet}
               n={previewN}
-              onHistoryOpen={() => setHistoryOpen(true)}
               initialQuestion={reuseQuestion}
             />
           )}

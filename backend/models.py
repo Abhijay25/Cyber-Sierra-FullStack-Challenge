@@ -46,10 +46,16 @@ class Session(Base):
 # ============================================================================
 
 
+class ConversationTurn(BaseModel):
+    question: str
+    answer: str
+
+
 class QueryRequest(BaseModel):
     sheet_name: str
     question: str
     n: int | None = None  # limit rows passed to AI; None = all rows
+    history: list[ConversationTurn] = []
 
 
 class QueryResponse(BaseModel):
