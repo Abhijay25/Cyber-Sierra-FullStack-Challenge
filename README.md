@@ -8,7 +8,7 @@ An AI-powered CSV/Excel analyser. Upload spreadsheets, preview data, and ask nat
 |---|---|
 | Frontend | Next.js 15 (App Router, TypeScript, TanStack Table, SWR) |
 | Backend | FastAPI (Python, uv) |
-| AI | OpenAI GPT-4o → PandasAI → fallback (context stuffing / retry) |
+| AI | OpenAI GPT-4o → PandasAI  |
 | Storage | In-memory DataFrames (session) + SQLite (history, preferences) |
 
 ## Prerequisites
@@ -77,6 +77,7 @@ Browser
 - All DB queries use SQLAlchemy ORM — no raw SQL string interpolation
 - Feedback endpoint verifies prompt ownership before updating
 - Query endpoint rate-limited to 20 requests/minute per IP
+Query undergoes basic sanitisation and further protection via in built guard rails on prompted models
 
 ## Production deployment
 
