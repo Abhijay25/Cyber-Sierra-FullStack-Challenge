@@ -37,6 +37,10 @@ async def query(
             detail=f"Sheet '{request.sheet_name}' not found for this session",
         )
 
+    if request.n is not None:
+        n = max(1, min(request.n, 500))
+        df = df.head(n)
+
     # Get preferences from DB; default to empty string
     session_row = (
         db.query(SessionModel)

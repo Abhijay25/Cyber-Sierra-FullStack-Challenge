@@ -108,13 +108,15 @@ export async function getData(
 
 export async function querySheet(
   sheetName: string,
-  question: string
+  question: string,
+  n: number,
 ): Promise<QueryResponse> {
   return jsonFetch<QueryResponse>('/api/query', {
     method: 'POST',
     body: JSON.stringify({
       sheet_name: sheetName,
       question: question,
+      n,
     }),
   })
 }

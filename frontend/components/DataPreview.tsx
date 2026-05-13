@@ -12,12 +12,12 @@ import { getData } from '@/lib/api'
 
 interface Props {
   sheetName: string
+  n: number
 }
 
 const columnHelper = createColumnHelper<Record<string, unknown>>()
 
-export default function DataPreview({ sheetName }: Props) {
-  const [n] = useState(25)
+export default function DataPreview({ sheetName, n }: Props) {
   const [maximized, setMaximized] = useState(false)
   const [data, setData] = useState<DataResponse | null>(null)
   const [loading, setLoading] = useState(false)

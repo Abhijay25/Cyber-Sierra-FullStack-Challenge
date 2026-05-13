@@ -5,11 +5,12 @@ import { querySheet, submitFeedback } from '@/lib/api'
 
 interface Props {
   sheetName: string
+  n: number
   onHistoryOpen: () => void
   initialQuestion?: string
 }
 
-export default function QueryInterface({ sheetName, onHistoryOpen, initialQuestion }: Props) {
+export default function QueryInterface({ sheetName, n, onHistoryOpen, initialQuestion }: Props) {
   const [question, setQuestion] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [answer, setAnswer] = useState<string | null>(null)
@@ -50,7 +51,7 @@ export default function QueryInterface({ sheetName, onHistoryOpen, initialQuesti
     setIsLoading(true)
 
     try {
-      const result = await querySheet(sheetName, question)
+      const result = await querySheet(sheetName, question, n)
       setAnswer(result.answer)
       setPromptId(result.prompt_id)
     } catch (err: unknown) {

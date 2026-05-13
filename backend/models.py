@@ -49,6 +49,7 @@ class Session(Base):
 class QueryRequest(BaseModel):
     sheet_name: str
     question: str
+    n: int | None = None  # limit rows passed to AI; None = all rows
 
 
 class QueryResponse(BaseModel):

@@ -14,6 +14,7 @@ export default function Home() {
   const [isUploading, setIsUploading] = useState(false)
   const [historyOpen, setHistoryOpen] = useState(false)
   const [reuseQuestion, setReuseQuestion] = useState('')
+  const [previewN, setPreviewN] = useState(25)
 
   const handleUpload = (newSheets: SheetMeta[]) => {
     setSheets(prev => {
@@ -40,12 +41,31 @@ export default function Home() {
           CSV / Excel Analyser
         </h1>
         {hasFiles && (
-          <FileUpload
-            onUpload={handleUpload}
-            isUploading={isUploading}
-            setIsUploading={setIsUploading}
-            mode="button"
-          />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#555' }}>
+              Rows to analyse:
+              <input
+                type="number"
+                min={1}
+                max={500}
+                value={previewN}
+                onChange={(e) => setPreviewN(Math.min(500, Math.max(1, Number(e.target.value))))}
+                style={{
+                  width: 64,
+                  padding: '4px 6px',
+                  border: '1px solid #ccc',
+                  borderRadius: 4,
+                  fontSize: 13,
+                }}
+              />
+            </label>
+            <FileUpload
+              onUpload={handleUpload}
+              isUploading={isUploading}
+              setIsUploading={setIsUploading}
+              mode="button"
+            />
+          </div>
         )}
       </div>
 
@@ -60,10 +80,11 @@ export default function Home() {
       {hasFiles && (
         <>
           <SheetTabs sheets={sheets} activeSheet={activeSheet} onSelect={setActiveSheet} />
-          {activeSheet && <DataPreview sheetName={activeSheet} />}
+          {activeSheet && <DataPreview sheetName={activeSheet} n={previewN} />}
           {activeSheet && (
             <QueryInterface
               sheetName={activeSheet}
+              n={previewN}
               onHistoryOpen={() => setHistoryOpen(true)}
               initialQuestion={reuseQuestion}
             />

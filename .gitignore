@@ -8,3 +8,4 @@ node_modules
 .DS_Store
 out/
 backend/static/
+backend/.env
