@@ -6,12 +6,14 @@ import FileUpload from '@/components/FileUpload'
 import SheetTabs from '@/components/SheetTabs'
 import DataPreview from '@/components/DataPreview'
 import QueryInterface from '@/components/QueryInterface'
+import HistoryPanel from '@/components/HistoryPanel'
 
 export default function Home() {
   const [sheets, setSheets] = useState<SheetMeta[]>([])
   const [activeSheet, setActiveSheet] = useState<string | null>(null)
   const [isUploading, setIsUploading] = useState(false)
   const [historyOpen, setHistoryOpen] = useState(false)
+  const [reuseQuestion, setReuseQuestion] = useState('')
 
   const handleUpload = (newSheets: SheetMeta[]) => {
     setSheets(prev => {
@@ -39,10 +41,19 @@ export default function Home() {
             <QueryInterface
               sheetName={activeSheet}
               onHistoryOpen={() => setHistoryOpen(true)}
+              initialQuestion={reuseQuestion}
             />
           )}
         </>
       )}
+      <HistoryPanel
+        isOpen={historyOpen}
+        onClose={() => setHistoryOpen(false)}
+        onReuse={(q) => {
+          setReuseQuestion(q)
+          setHistoryOpen(false)
+        }}
+      />
     </main>
   )
 }

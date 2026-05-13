@@ -6,9 +6,10 @@ import { querySheet, submitFeedback } from '@/lib/api'
 interface Props {
   sheetName: string
   onHistoryOpen: () => void
+  initialQuestion?: string
 }
 
-export default function QueryInterface({ sheetName, onHistoryOpen }: Props) {
+export default function QueryInterface({ sheetName, onHistoryOpen, initialQuestion }: Props) {
   const [question, setQuestion] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [answer, setAnswer] = useState<string | null>(null)
@@ -29,6 +30,13 @@ export default function QueryInterface({ sheetName, onHistoryOpen }: Props) {
     setComment('')
     setError(null)
   }, [sheetName])
+
+  // Set question when initialQuestion changes
+  useEffect(() => {
+    if (initialQuestion) {
+      setQuestion(initialQuestion)
+    }
+  }, [initialQuestion])
 
   const handleSubmit = async () => {
     if (!question.trim() || isLoading) return
