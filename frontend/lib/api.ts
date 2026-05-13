@@ -70,7 +70,7 @@ export async function uploadFiles(files: File[]): Promise<UploadResponse> {
     formData.append('files', file)
   })
 
-  const response = await fetch(`${BASE_URL}/upload`, {
+  const response = await fetch(`${BASE_URL}/api/upload`, {
     method: 'POST',
     body: formData,
     credentials: 'include',
@@ -91,7 +91,7 @@ export async function uploadFiles(files: File[]): Promise<UploadResponse> {
 }
 
 export async function getSheets(): Promise<UploadResponse> {
-  return jsonFetch<UploadResponse>('/sheets', {
+  return jsonFetch<UploadResponse>('/api/sheets', {
     method: 'GET',
   })
 }
@@ -100,12 +100,8 @@ export async function getData(
   sheetName: string,
   n: number
 ): Promise<DataResponse> {
-  const params = new URLSearchParams({
-    sheet_name: sheetName,
-    n: n.toString(),
-  })
-
-  return jsonFetch<DataResponse>(`/data?${params.toString()}`, {
+  const encodedSheet = encodeURIComponent(sheetName)
+  return jsonFetch<DataResponse>(`/api/data/${encodedSheet}?n=${n}`, {
     method: 'GET',
   })
 }
@@ -114,7 +110,7 @@ export async function querySheet(
   sheetName: string,
   question: string
 ): Promise<QueryResponse> {
-  return jsonFetch<QueryResponse>('/query', {
+  return jsonFetch<QueryResponse>('/api/query', {
     method: 'POST',
     body: JSON.stringify({
       sheet_name: sheetName,
@@ -124,7 +120,7 @@ export async function querySheet(
 }
 
 export async function getHistory(): Promise<HistoryResponse> {
-  return jsonFetch<HistoryResponse>('/history', {
+  return jsonFetch<HistoryResponse>('/api/history', {
     method: 'GET',
   })
 }
@@ -134,7 +130,7 @@ export async function submitFeedback(
   feedback: 'up' | 'down',
   comment?: string
 ): Promise<void> {
-  await jsonFetch<void>('/feedback', {
+  await jsonFetch<void>('/api/feedback', {
     method: 'POST',
     body: JSON.stringify({
       prompt_id: promptId,
