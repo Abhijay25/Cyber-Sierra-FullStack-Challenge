@@ -111,21 +111,61 @@ export interface ConversationTurn {
   answer: string
 }
 
-export async function querySheet(
+export async function querySheetStream(
   sheetName: string,
   question: string,
   n: number,
-  history: ConversationTurn[] = [],
-): Promise<QueryResponse> {
-  return jsonFetch<QueryResponse>('/api/query', {
+  history: ConversationTurn[],
+  onToken: (token: string) => void,
+  onDone: (promptId: number) => void,
+): Promise<void> {
+  const response = await fetch(`${BASE_URL}/api/query`, {
     method: 'POST',
-    body: JSON.stringify({
-      sheet_name: sheetName,
-      question: question,
-      n,
-      history,
-    }),
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ sheet_name: sheetName, question, n, history }),
   })
+
+  if (!response.ok) {
+    let errorMessage = `HTTP ${response.status}`
+    try {
+      const errorData = await response.json()
+      errorMessage = errorData.detail || errorMessage
+    } catch { /* ignore */ }
+    throw new Error(errorMessage)
+  }
+
+  const reader = response.body!.getReader()
+  const decoder = new TextDecoder()
+  let buffer = ''
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+
+      buffer += decoder.decode(value, { stream: true })
+      const lines = buffer.split('\n')
+      buffer = lines.pop() ?? ''
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue
+        const jsonStr = line.slice(6).trim()
+        if (!jsonStr) continue
+        let data: { token?: string; done?: boolean; prompt_id?: number; error?: string }
+        try {
+          data = JSON.parse(jsonStr)
+        } catch {
+          continue
+        }
+        if (data.error) throw new Error(data.error)
+        if (data.done && data.prompt_id !== undefined) onDone(data.prompt_id)
+        else if (data.token) onToken(data.token)
+      }
+    }
+  } finally {
+    reader.releaseLock()
+  }
 }
 
 export async function getHistory(): Promise<HistoryResponse> {

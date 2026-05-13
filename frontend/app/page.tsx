@@ -93,7 +93,13 @@ export default function Home() {
       {hasFiles && (
         <>
           <SheetTabs sheets={sheets} activeSheet={activeSheet} onSelect={setActiveSheet} />
-          {activeSheet && <DataPreview sheetName={activeSheet} n={previewN} />}
+          {activeSheet && (
+            <DataPreview
+              sheetName={activeSheet}
+              n={previewN}
+              totalRows={sheets.find(s => s.name === activeSheet)?.row_count ?? null}
+            />
+          )}
           {activeSheet && (
             <QueryInterface
               sheetName={activeSheet}

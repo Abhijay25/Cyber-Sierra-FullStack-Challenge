@@ -161,13 +161,14 @@ async def _openai_context_stuffing(
     return content.strip() if content else "Could not compute an answer for this question."
 
 
-async def _openai_format(
+async def _openai_format_stream(
     raw_result: str,
     question: str,
     preferences_md: str,
     history: list[dict[str, str]],
-) -> str:
-    """Step 2.5: Format the raw result into a clear, concise answer."""
+):
+    """Step 2.5: Stream the formatted answer token by token."""
+    from typing import AsyncGenerator
     prefs_section = (
         f"\n\nApply these user style preferences to your answer:\n{preferences_md}"
         if preferences_md else ""
@@ -183,13 +184,16 @@ async def _openai_format(
         messages.append({"role": "assistant", "content": turn["answer"]})
     messages.append({"role": "user", "content": f"Question: {question}\nResult: {raw_result}"})
 
-    response = await _get_async_client().chat.completions.create(
+    stream = await _get_async_client().chat.completions.create(
         model="gpt-4o",
         messages=messages,  # type: ignore[arg-type]
         max_tokens=300,
+        stream=True,
     )
-    content = response.choices[0].message.content
-    return content.strip() if content else raw_result
+    async for chunk in stream:
+        token = chunk.choices[0].delta.content
+        if token:
+            yield token
 
 
 # ---------------------------------------------------------------------------
@@ -197,26 +201,23 @@ async def _openai_format(
 # ---------------------------------------------------------------------------
 
 
-async def run_pipeline(
+async def run_pipeline_compute(
     question: str,
     df: pd.DataFrame,
     preferences_md: str,
     history: list[dict[str, str]] | None = None,
 ) -> tuple[str, str]:
     """
-    Full AI query pipeline.
+    Steps 1 and 2 of the pipeline: rewrite + PandasAI execution.
 
-    Returns (refined_prompt, answer).
+    Returns (refined_prompt, raw_result). The caller streams the format step.
     """
     hist = history or []
     columns = [str(c) for c in df.columns.tolist()]
 
-    # Step 1 — Reformulate question via OpenAI (with conversation context)
     refined_prompt = await _openai_rewrite(question, columns, preferences_md, hist)
     logger.info("Refined prompt: %s", refined_prompt)
 
-    # Step 2 — PandasAI execution (sync, wrapped in thread)
-    raw_result: Optional[str] = None
     try:
         raw_result = await asyncio.to_thread(_run_pandasai, df, refined_prompt)
     except Exception:
@@ -229,11 +230,9 @@ async def run_pipeline(
                 raw_result = await asyncio.to_thread(_run_pandasai, df, simplified)
             except Exception:
                 logger.exception("PandasAI failed on simplified prompt")
-                return refined_prompt, "Could not compute an answer for this question."
+                raw_result = "Could not compute an answer for this question."
 
-    # Step 2.5 — Formatting pass (with conversation context)
-    answer = await _openai_format(raw_result, question, preferences_md, hist)
-    return refined_prompt, answer
+    return refined_prompt, str(raw_result)
 
 
 async def update_preferences(

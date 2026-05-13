@@ -13,11 +13,12 @@ import { getData } from '@/lib/api'
 interface Props {
   sheetName: string
   n: number
+  totalRows: number | null
 }
 
 const columnHelper = createColumnHelper<Record<string, unknown>>()
 
-export default function DataPreview({ sheetName, n }: Props) {
+export default function DataPreview({ sheetName, n, totalRows }: Props) {
   const [maximized, setMaximized] = useState(false)
   const [data, setData] = useState<DataResponse | null>(null)
   const [loading, setLoading] = useState(false)
@@ -68,7 +69,13 @@ export default function DataPreview({ sheetName, n }: Props) {
     <div style={{ marginBottom: 32 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
         <span style={{ fontSize: 13, color: '#666' }}>
-          {loading ? 'Loading…' : data ? `${data.rows.length} rows` : ''}
+          {loading
+            ? 'Loading…'
+            : data
+              ? totalRows !== null && totalRows > data.rows.length
+                ? `Showing ${data.rows.length} of ${totalRows} rows`
+                : `${data.rows.length} rows`
+              : ''}
         </span>
         {data && (
           <button

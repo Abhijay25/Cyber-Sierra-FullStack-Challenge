@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()  # must run before any module that reads env vars at import time
 
+import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -28,9 +29,11 @@ app = FastAPI(title="CSV Analyser API", lifespan=lifespan)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)  # type: ignore[arg-type]
 
+ALLOWED_ORIGIN = os.getenv("ALLOWED_ORIGIN", "http://localhost:3000")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=[ALLOWED_ORIGIN],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

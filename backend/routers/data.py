@@ -10,6 +10,8 @@ from services import session_store
 
 router = APIRouter(tags=["data"])
 
+MAX_SHEET_NAME_LEN = 255
+
 
 @router.get("/sheets")
 async def get_sheets(session_id: str | None = Cookie(None)) -> JSONResponse:
@@ -55,8 +57,13 @@ async def get_data(
             content={"detail": "session_id cookie is required"},
         )
 
-    # URL-decode the sheet_name
     sheet_name = unquote(sheet_name)
+
+    if not sheet_name or len(sheet_name) > MAX_SHEET_NAME_LEN:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"detail": "Invalid sheet name."},
+        )
 
     n = max(1, n)
 
