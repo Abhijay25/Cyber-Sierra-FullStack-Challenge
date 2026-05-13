@@ -137,7 +137,7 @@ async def upload(
         key="session_id",
         value=sid,
         httponly=True,
-        samesite="lax",
+        samesite="strict",
         secure=SECURE_COOKIES,
         max_age=86400,  # 24 hours
         path="/",

@@ -3,10 +3,11 @@ from __future__ import annotations
 import json
 from urllib.parse import unquote
 
-from fastapi import APIRouter, Cookie, status
+from fastapi import APIRouter, Cookie, Request, status
 from fastapi.responses import JSONResponse
 
 from services import session_store
+from services.limiter import limiter
 
 router = APIRouter(tags=["data"])
 
@@ -14,7 +15,8 @@ MAX_SHEET_NAME_LEN = 255
 
 
 @router.get("/sheets")
-async def get_sheets(session_id: str | None = Cookie(None)) -> JSONResponse:
+@limiter.limit("60/minute")
+async def get_sheets(request: Request, session_id: str | None = Cookie(None)) -> JSONResponse:
     """
     Get metadata for all sheets in the current session.
 
@@ -35,7 +37,9 @@ async def get_sheets(session_id: str | None = Cookie(None)) -> JSONResponse:
 
 
 @router.get("/data/{sheet_name:path}")
+@limiter.limit("120/minute")
 async def get_data(
+    request: Request,
     sheet_name: str,
     session_id: str | None = Cookie(None),
     n: int = 10,

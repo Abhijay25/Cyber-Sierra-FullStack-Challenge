@@ -2,23 +2,19 @@
 
 import { useState, useEffect, useRef, KeyboardEvent } from 'react'
 import ReactMarkdown from 'react-markdown'
-import type { ConversationTurn } from '@/lib/api'
+import type { ConversationTurn, Turn } from '@/lib/api'
 import { querySheetStream, submitFeedback } from '@/lib/api'
 
 interface Props {
   sheetName: string
   n: number
   initialQuestion?: string
+  turns: Turn[]
+  onTurnsChange: (turns: Turn[]) => void
 }
 
-interface Turn extends ConversationTurn {
-  promptId: number
-  feedback: 'up' | 'down' | null
-}
-
-export default function QueryInterface({ sheetName, n, initialQuestion }: Props) {
+export default function QueryInterface({ sheetName, n, initialQuestion, turns, onTurnsChange }: Props) {
   const [question, setQuestion] = useState('')
-  const [turns, setTurns] = useState<Turn[]>([])
   const [pendingQuestion, setPendingQuestion] = useState<string | null>(null)
   const [streamingAnswer, setStreamingAnswer] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -29,7 +25,6 @@ export default function QueryInterface({ sheetName, n, initialQuestion }: Props)
 
   useEffect(() => {
     setQuestion('')
-    setTurns([])
     setPendingQuestion(null)
     setStreamingAnswer('')
     setIsLoading(false)
@@ -72,7 +67,7 @@ export default function QueryInterface({ sheetName, n, initialQuestion }: Props)
       )
 
       if (promptId !== null) {
-        setTurns(prev => [...prev, { question: q, answer: fullAnswer, promptId: promptId!, feedback: null }])
+        onTurnsChange([...turns, { question: q, answer: fullAnswer, promptId: promptId!, feedback: null }])
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to get an answer.')
@@ -91,7 +86,7 @@ export default function QueryInterface({ sheetName, n, initialQuestion }: Props)
     const turn = turns[idx]
     if (!turn || turn.feedback !== null) return
     try { await submitFeedback(turn.promptId, 'up') } catch { /* best-effort */ }
-    setTurns(prev => prev.map((t, i) => i === idx ? { ...t, feedback: 'up' } : t))
+    onTurnsChange(turns.map((t, i) => i === idx ? { ...t, feedback: 'up' } : t))
   }
 
   const handleThumbsDown = (idx: number) => {
@@ -103,7 +98,7 @@ export default function QueryInterface({ sheetName, n, initialQuestion }: Props)
     const turn = turns[idx]
     if (!turn) return
     try { await submitFeedback(turn.promptId, 'down', comment) } catch { /* best-effort */ }
-    setTurns(prev => prev.map((t, i) => i === idx ? { ...t, feedback: 'down' } : t))
+    onTurnsChange(turns.map((t, i) => i === idx ? { ...t, feedback: 'down' } : t))
     setShowCommentFor(null)
   }
 
@@ -130,6 +125,7 @@ export default function QueryInterface({ sheetName, n, initialQuestion }: Props)
                         onChange={(e) => setComment(e.target.value)}
                         onKeyDown={(e) => { if (e.key === 'Enter') void handleCommentSubmit(idx) }}
                         placeholder="What went wrong? (optional)"
+                        maxLength={200}
                         style={commentInputStyle}
                       />
                       <button onClick={() => void handleCommentSubmit(idx)} style={submitBtnStyle}>

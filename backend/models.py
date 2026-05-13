@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy import String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -66,4 +66,4 @@ class QueryResponse(BaseModel):
 class FeedbackRequest(BaseModel):
     prompt_id: int
     feedback: Literal["up", "down"]
-    comment: str | None = None
+    comment: str | None = Field(default=None, max_length=200)

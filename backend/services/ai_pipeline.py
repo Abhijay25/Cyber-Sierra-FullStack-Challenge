@@ -116,13 +116,35 @@ async def _openai_rewrite(
     return content.strip() if content else question
 
 
-def _run_pandasai(df: pd.DataFrame, prompt: str) -> str:
-    """Run PandasAI Agent synchronously. Called via asyncio.to_thread."""
+# ---------------------------------------------------------------------------
+# PandasAI agent cache — keyed on (session_id, sheet_name, df_row_count)
+# so a new agent is only created when the session, sheet, or analysed row
+# count changes. Cleared when files are re-uploaded or a session is evicted.
+# ---------------------------------------------------------------------------
+
+_agent_cache: dict[tuple[str, str, int], object] = {}
+
+
+def clear_session_agents(session_id: str) -> None:
+    stale = [k for k in _agent_cache if k[0] == session_id]
+    for k in stale:
+        del _agent_cache[k]
+
+
+def _get_or_create_agent(session_id: str, sheet_name: str, df: pd.DataFrame) -> object:
     from pandasai import Agent
 
-    llm = _OpenAIAdapter(api_key=OPENAI_API_KEY)
-    agent = Agent([df], config={"llm": llm})
-    result = agent.chat(prompt)
+    key = (session_id, sheet_name, len(df))
+    if key not in _agent_cache:
+        llm = _OpenAIAdapter(api_key=OPENAI_API_KEY)
+        _agent_cache[key] = Agent([df], config={"llm": llm})
+    return _agent_cache[key]
+
+
+def _run_pandasai(session_id: str, sheet_name: str, df: pd.DataFrame, prompt: str) -> str:
+    """Run PandasAI Agent synchronously, reusing a cached agent. Called via asyncio.to_thread."""
+    agent = _get_or_create_agent(session_id, sheet_name, df)
+    result = agent.chat(prompt)  # type: ignore[union-attr]
     return str(result)
 
 
@@ -224,6 +246,8 @@ async def run_pipeline_compute(
     df: pd.DataFrame,
     preferences_md: str,
     history: list[dict[str, str]] | None = None,
+    session_id: str = "",
+    sheet_name: str = "",
 ) -> tuple[str, str]:
     """
     Steps 1 and 2 of the pipeline: rewrite + PandasAI execution.
@@ -241,7 +265,7 @@ async def run_pipeline_compute(
         return refined_prompt, f"{_NOT_APPLICABLE} {reason}"
 
     try:
-        raw_result = await asyncio.to_thread(_run_pandasai, df, refined_prompt)
+        raw_result = await asyncio.to_thread(_run_pandasai, session_id, sheet_name, df, refined_prompt)
     except Exception:
         logger.exception("PandasAI failed")
         if len(df) <= 100:
@@ -249,7 +273,7 @@ async def run_pipeline_compute(
         else:
             simplified = await _simplify_prompt(question, columns)
             try:
-                raw_result = await asyncio.to_thread(_run_pandasai, df, simplified)
+                raw_result = await asyncio.to_thread(_run_pandasai, session_id, sheet_name, df, simplified)
             except Exception:
                 logger.exception("PandasAI failed on simplified prompt")
                 raw_result = "Could not compute an answer for this question."

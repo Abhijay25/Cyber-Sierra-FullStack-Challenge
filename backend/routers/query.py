@@ -82,7 +82,8 @@ async def query(
     async def generate():
         try:
             refined_prompt, raw_result = await run_pipeline_compute(
-                question, df, preferences_md, history
+                question, df, preferences_md, history,
+                session_id=session_id, sheet_name=body.sheet_name,
             )
 
             full_answer = ""

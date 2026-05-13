@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import type { SheetMeta } from '@/lib/api'
+import type { SheetMeta, Turn } from '@/lib/api'
 import FileUpload from '@/components/FileUpload'
 import SheetTabs from '@/components/SheetTabs'
 import DataPreview from '@/components/DataPreview'
@@ -15,6 +15,7 @@ export default function Home() {
   const [historyOpen, setHistoryOpen] = useState(false)
   const [reuseQuestion, setReuseQuestion] = useState('')
   const [previewN, setPreviewN] = useState(25)
+  const [sheetConversations, setSheetConversations] = useState<Record<string, Turn[]>>({})
 
   const handleUpload = (newSheets: SheetMeta[]) => {
     setSheets(prev => {
@@ -105,6 +106,10 @@ export default function Home() {
               sheetName={activeSheet}
               n={previewN}
               initialQuestion={reuseQuestion}
+              turns={sheetConversations[activeSheet] ?? []}
+              onTurnsChange={(turns) =>
+                setSheetConversations(prev => ({ ...prev, [activeSheet]: turns }))
+              }
             />
           )}
         </>

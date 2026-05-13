@@ -111,6 +111,11 @@ export interface ConversationTurn {
   answer: string
 }
 
+export interface Turn extends ConversationTurn {
+  promptId: number
+  feedback: 'up' | 'down' | null
+}
+
 export async function querySheetStream(
   sheetName: string,
   question: string,

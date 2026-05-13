@@ -16,18 +16,24 @@ def _touch(session_id: str) -> None:
 
 
 def _evict_stale() -> None:
+    from services.ai_pipeline import clear_session_agents
+
     cutoff = time.monotonic() - SESSION_TTL
     stale = [sid for sid, v in _store.items() if v["last_access"] < cutoff]
     for sid in stale:
+        clear_session_agents(sid)
         del _store[sid]
 
 
 def set_sheets(session_id: str, sheets: dict[str, pd.DataFrame]) -> None:
+    from services.ai_pipeline import clear_session_agents
+
     _evict_stale()
     if session_id not in _store:
         _store[session_id] = {"sheets": {}, "last_access": time.monotonic()}
     _store[session_id]["sheets"].update(sheets)
     _store[session_id]["last_access"] = time.monotonic()
+    clear_session_agents(session_id)
 
 
 def get_sheets(session_id: str) -> dict[str, pd.DataFrame] | None:
