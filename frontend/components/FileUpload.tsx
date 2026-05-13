@@ -8,6 +8,7 @@ interface Props {
   onUpload: (sheets: SheetMeta[]) => void
   isUploading: boolean
   setIsUploading: (v: boolean) => void
+  mode?: 'dropzone' | 'button'
 }
 
 const ACCEPTED_EXTENSIONS = ['.csv', '.xls', '.xlsx']
@@ -23,7 +24,7 @@ function isValidFile(file: File): boolean {
     ACCEPTED_MIME.includes(file.type)
 }
 
-export default function FileUpload({ onUpload, isUploading, setIsUploading }: Props) {
+export default function FileUpload({ onUpload, isUploading, setIsUploading, mode = 'dropzone' }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [dragOver, setDragOver] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -44,7 +45,6 @@ export default function FileUpload({ onUpload, isUploading, setIsUploading }: Pr
     try {
       const result = await uploadFiles(valid)
       onUpload(result.sheets)
-      // Reset input so the same file can be re-uploaded
       if (inputRef.current) {
         inputRef.current.value = ''
       }
@@ -68,10 +68,6 @@ export default function FileUpload({ onUpload, isUploading, setIsUploading }: Pr
     if (!isUploading) setDragOver(true)
   }
 
-  function onDragLeave() {
-    setDragOver(false)
-  }
-
   function onInputChange(e: ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? [])
     if (files.length > 0) {
@@ -83,6 +79,45 @@ export default function FileUpload({ onUpload, isUploading, setIsUploading }: Pr
     if (!isUploading) {
       inputRef.current?.click()
     }
+  }
+
+  const hiddenInput = (
+    <input
+      ref={inputRef}
+      type="file"
+      accept=".csv,.xls,.xlsx"
+      multiple
+      style={{ display: 'none' }}
+      onChange={onInputChange}
+    />
+  )
+
+  if (mode === 'button') {
+    return (
+      <div>
+        {hiddenInput}
+        <button
+          onClick={onClick}
+          disabled={isUploading}
+          style={{
+            padding: '7px 16px',
+            border: '1px solid #0070f3',
+            borderRadius: 6,
+            background: '#0070f3',
+            color: '#fff',
+            fontSize: 14,
+            fontWeight: 500,
+            cursor: isUploading ? 'not-allowed' : 'pointer',
+            opacity: isUploading ? 0.6 : 1,
+          }}
+        >
+          {isUploading ? 'Uploading…' : '+ Add Files'}
+        </button>
+        {error && (
+          <p style={{ color: '#d9534f', fontSize: 13, margin: '6px 0 0', textAlign: 'right' }}>{error}</p>
+        )}
+      </div>
+    )
   }
 
   const dropZoneStyle: React.CSSProperties = {
@@ -104,25 +139,16 @@ export default function FileUpload({ onUpload, isUploading, setIsUploading }: Pr
         style={dropZoneStyle}
         onDrop={onDrop}
         onDragOver={onDragOver}
-        onDragLeave={onDragLeave}
+        onDragLeave={() => setDragOver(false)}
         onClick={onClick}
         role="button"
         tabIndex={0}
         aria-label="File upload drop zone"
         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onClick() }}
       >
-        <input
-          ref={inputRef}
-          type="file"
-          accept=".csv,.xls,.xlsx"
-          multiple
-          style={{ display: 'none' }}
-          onChange={onInputChange}
-        />
+        {hiddenInput}
         <p style={{ margin: 0, color: '#555', fontSize: 15 }}>
-          {isUploading
-            ? 'Uploading...'
-            : 'Drop CSV or Excel files here, or click to browse'}
+          {isUploading ? 'Uploading…' : 'Drop CSV or Excel files here, or click to browse'}
         </p>
         <p style={{ margin: '6px 0 0', color: '#999', fontSize: 12 }}>
           Supported formats: .csv, .xls, .xlsx

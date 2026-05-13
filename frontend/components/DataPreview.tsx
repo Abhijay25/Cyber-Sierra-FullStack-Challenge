@@ -17,7 +17,8 @@ interface Props {
 const columnHelper = createColumnHelper<Record<string, unknown>>()
 
 export default function DataPreview({ sheetName }: Props) {
-  const [n, setN] = useState(10)
+  const [n] = useState(25)
+  const [maximized, setMaximized] = useState(false)
   const [data, setData] = useState<DataResponse | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -29,14 +30,10 @@ export default function DataPreview({ sheetName }: Props) {
 
     getData(sheetName, n)
       .then((result) => {
-        if (!cancelled) {
-          setData(result)
-        }
+        if (!cancelled) setData(result)
       })
       .catch((err: unknown) => {
-        if (!cancelled) {
-          setError(err instanceof Error ? err.message : 'Failed to fetch data.')
-        }
+        if (!cancelled) setError(err instanceof Error ? err.message : 'Failed to fetch data.')
       })
       .finally(() => {
         if (!cancelled) setLoading(false)
@@ -69,43 +66,43 @@ export default function DataPreview({ sheetName }: Props) {
 
   return (
     <div style={{ marginBottom: 32 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-        <label
-          htmlFor="preview-n"
-          style={{ fontSize: 14, color: '#444', fontWeight: 500 }}
-        >
-          Show top N rows:
-        </label>
-        <input
-          id="preview-n"
-          type="number"
-          min={1}
-          max={500}
-          value={n}
-          onChange={(e) => {
-            const val = Math.min(500, Math.max(1, Number(e.target.value)))
-            setN(val)
-          }}
-          style={{
-            width: 80,
-            padding: '4px 8px',
-            border: '1px solid #ccc',
-            borderRadius: 4,
-            fontSize: 14,
-          }}
-        />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+        <span style={{ fontSize: 13, color: '#666' }}>
+          {loading ? 'Loading…' : data ? `${data.rows.length} rows` : ''}
+        </span>
+        {data && (
+          <button
+            onClick={() => setMaximized((m) => !m)}
+            style={{
+              padding: '4px 12px',
+              fontSize: 12,
+              border: '1px solid #ccc',
+              borderRadius: 4,
+              background: '#fff',
+              cursor: 'pointer',
+              color: '#444',
+            }}
+          >
+            {maximized ? '⊟ Minimise' : '⊞ Maximise'}
+          </button>
+        )}
       </div>
-
-      {loading && (
-        <p style={{ color: '#888', fontSize: 14 }}>Loading...</p>
-      )}
 
       {error && !loading && (
         <p style={{ color: '#d9534f', fontSize: 14 }}>{error}</p>
       )}
 
-      {!loading && !error && data && (
-        <div style={{ overflowX: 'auto', border: '1px solid #e0e0e0', borderRadius: 6 }}>
+      {!error && data && (
+        <div
+          style={{
+            overflowX: 'auto',
+            overflowY: 'auto',
+            border: '1px solid #e0e0e0',
+            borderRadius: 6,
+            maxHeight: maximized ? 'none' : 300,
+            transition: 'max-height 0.2s ease',
+          }}
+        >
           <table
             style={{
               borderCollapse: 'collapse',
@@ -114,7 +111,7 @@ export default function DataPreview({ sheetName }: Props) {
               minWidth: 'max-content',
             }}
           >
-            <thead>
+            <thead style={{ position: 'sticky', top: 0, zIndex: 1 }}>
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id} style={{ backgroundColor: '#f5f5f5' }}>
                   {headerGroup.headers.map((header) => (
@@ -128,6 +125,7 @@ export default function DataPreview({ sheetName }: Props) {
                         borderBottom: '2px solid #ddd',
                         borderRight: '1px solid #e8e8e8',
                         color: '#333',
+                        backgroundColor: '#f5f5f5',
                       }}
                     >
                       {header.isPlaceholder
@@ -142,19 +140,17 @@ export default function DataPreview({ sheetName }: Props) {
               {table.getRowModel().rows.map((row, rowIndex) => (
                 <tr
                   key={row.id}
-                  style={{
-                    backgroundColor: rowIndex % 2 === 0 ? '#ffffff' : '#f9f9f9',
-                  }}
+                  style={{ backgroundColor: rowIndex % 2 === 0 ? '#ffffff' : '#f9f9f9' }}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <td
                       key={cell.id}
                       style={{
-                        padding: '7px 12px',
+                        padding: '6px 12px',
                         borderBottom: '1px solid #ebebeb',
                         borderRight: '1px solid #ebebeb',
                         whiteSpace: 'nowrap',
-                        maxWidth: 300,
+                        maxWidth: 220,
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                         color: '#555',

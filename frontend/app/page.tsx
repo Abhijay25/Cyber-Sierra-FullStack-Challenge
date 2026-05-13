@@ -17,7 +17,6 @@ export default function Home() {
 
   const handleUpload = (newSheets: SheetMeta[]) => {
     setSheets(prev => {
-      // Merge: keep existing sheets, add/update new ones
       const existing = new Map(prev.map(s => [s.name, s]))
       newSheets.forEach(s => existing.set(s.name, s))
       return Array.from(existing.values())
@@ -27,13 +26,38 @@ export default function Home() {
     }
   }
 
+  const hasFiles = sheets.length > 0
+
   return (
-    <main style={{ maxWidth: 1200, margin: '0 auto', padding: '24px 16px' }}>
-      <h1 style={{ marginBottom: 24, fontSize: 24, fontWeight: 600 }}>
-        CSV / Excel Analyser
-      </h1>
-      <FileUpload onUpload={handleUpload} isUploading={isUploading} setIsUploading={setIsUploading} />
-      {sheets.length > 0 && (
+    <main style={{ maxWidth: 1600, margin: '0 auto', padding: '24px 24px' }}>
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 24,
+      }}>
+        <h1 style={{ margin: 0, fontSize: 24, fontWeight: 600 }}>
+          CSV / Excel Analyser
+        </h1>
+        {hasFiles && (
+          <FileUpload
+            onUpload={handleUpload}
+            isUploading={isUploading}
+            setIsUploading={setIsUploading}
+            mode="button"
+          />
+        )}
+      </div>
+
+      {!hasFiles && (
+        <FileUpload
+          onUpload={handleUpload}
+          isUploading={isUploading}
+          setIsUploading={setIsUploading}
+        />
+      )}
+
+      {hasFiles && (
         <>
           <SheetTabs sheets={sheets} activeSheet={activeSheet} onSelect={setActiveSheet} />
           {activeSheet && <DataPreview sheetName={activeSheet} />}
@@ -46,6 +70,7 @@ export default function Home() {
           )}
         </>
       )}
+
       <HistoryPanel
         isOpen={historyOpen}
         onClose={() => setHistoryOpen(false)}
