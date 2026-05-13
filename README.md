@@ -77,7 +77,8 @@ Browser
 - All DB queries use SQLAlchemy ORM — no raw SQL string interpolation
 - Feedback endpoint verifies prompt ownership before updating
 - Query endpoint rate-limited to 20 requests/minute per IP
-Query undergoes basic sanitisation and further protection via in built guard rails on prompted models
+- Query undergoes basic sanitisation; further protection via OpenAI's built-in content guardrails
+- `@tanstack/react-table` was audited against the May 11 2026 Shai-Hulud npm supply chain attack (CVE-2026-45321) — the `@tanstack/table*` family was confirmed clean; only the router/start ecosystem was compromised
 
 ## Production deployment
 

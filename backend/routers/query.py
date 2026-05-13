@@ -45,35 +45,28 @@ def _validate_sheet_name(name: str) -> None:
 @router.post("/query")
 @limiter.limit("20/minute")
 async def query(
-    http_request: Request,
-    request: QueryRequest,
+    request: Request,
+    body: QueryRequest,
     session_id: str | None = Cookie(None),
 ) -> StreamingResponse:
-    """
-    Run the AI pipeline against the uploaded sheet, streaming the answer.
-
-    Rate limited: 20 requests/minute per IP.
-    Requires session_id cookie.
-    Returns a text/event-stream of {"token": str} events, ending with {"done": true, "prompt_id": int}.
-    """
     if session_id is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="session_id cookie is required",
         )
 
-    _validate_sheet_name(request.sheet_name)
-    question = _sanitise_question(request.question)
+    _validate_sheet_name(body.sheet_name)
+    question = _sanitise_question(body.question)
 
-    df = get_sheet(session_id, request.sheet_name)
+    df = get_sheet(session_id, body.sheet_name)
     if df is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Sheet '{request.sheet_name}' not found for this session",
+            detail=f"Sheet '{body.sheet_name}' not found for this session",
         )
 
-    if request.n is not None:
-        df = df.head(max(1, request.n))
+    if body.n is not None:
+        df = df.head(max(1, body.n))
 
     # Read preferences before streaming starts
     with SessionLocal() as db:
@@ -84,7 +77,7 @@ async def query(
         )
         preferences_md = session_row.preferences_md if session_row is not None else ""
 
-    history = [{"question": t.question, "answer": t.answer} for t in request.history]
+    history = [{"question": t.question, "answer": t.answer} for t in body.history]
 
     async def generate():
         try:
@@ -101,7 +94,7 @@ async def query(
             with SessionLocal() as db:
                 prompt_row = Prompt(
                     session_id=session_id,
-                    sheet_name=request.sheet_name,
+                    sheet_name=body.sheet_name,
                     question=question,
                     refined_prompt=refined_prompt,
                     answer=full_answer,
