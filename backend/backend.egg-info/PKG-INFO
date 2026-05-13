@@ -1,0 +1,15 @@
+Metadata-Version: 2.4
+Name: backend
+Version: 0.1.0
+Summary: Add your description here
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: fastapi>=0.136.1
+Requires-Dist: openai>=2.36.0
+Requires-Dist: openpyxl>=3.1.5
+Requires-Dist: pandas>=2.3.3
+Requires-Dist: pandasai>=3.0.0
+Requires-Dist: python-dotenv>=1.2.2
+Requires-Dist: python-multipart>=0.0.28
+Requires-Dist: sqlalchemy>=2.0.49
+Requires-Dist: uvicorn[standard]>=0.46.0
