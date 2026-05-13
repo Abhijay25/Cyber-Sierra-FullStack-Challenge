@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, KeyboardEvent } from 'react'
+import ReactMarkdown from 'react-markdown'
 import { querySheet, submitFeedback } from '@/lib/api'
 
 interface Props {
@@ -171,9 +172,9 @@ export default function QueryInterface({ sheetName, n, onHistoryOpen, initialQue
             backgroundColor: '#fafafa',
           }}
         >
-          <p style={{ margin: '0 0 16px', fontSize: 14, color: '#333', lineHeight: 1.6 }}>
-            {answer}
-          </p>
+          <div style={{ margin: '0 0 16px', fontSize: 14, color: '#333', lineHeight: 1.6 }}>
+            <ReactMarkdown>{answer}</ReactMarkdown>
+          </div>
 
           {/* Feedback */}
           {feedbackGiven !== null ? (

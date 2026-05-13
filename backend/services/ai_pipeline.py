@@ -149,20 +149,27 @@ async def _openai_context_stuffing(
 
 async def _openai_format(raw_result: str, question: str, preferences_md: str) -> str:
     """Step 2.5: Format the raw result into a clear, concise answer."""
-    prefs_section = f" {preferences_md}" if preferences_md else ""
+    prefs_section = (
+        f"\n\nApply these user style preferences to your answer:\n{preferences_md}"
+        if preferences_md else ""
+    )
     response = await _get_async_client().chat.completions.create(
         model="gpt-4o",
         messages=[
             {
                 "role": "system",
-                "content": f"Present this data analysis result clearly and concisely.{prefs_section}",
+                "content": (
+                    "You are a data analysis assistant. Present the result as a short, "
+                    "direct answer (2-4 sentences). Do not invent data not present in the result."
+                    f"{prefs_section}"
+                ),
             },
             {
                 "role": "user",
                 "content": f"Question: {question}\nResult: {raw_result}",
             },
         ],
-        max_tokens=500,
+        max_tokens=300,
     )
     content = response.choices[0].message.content
     return content.strip() if content else raw_result
@@ -230,20 +237,22 @@ async def update_preferences(
             {
                 "role": "system",
                 "content": (
-                    "You maintain a user preferences document for AI data analysis. "
-                    "Merge this new feedback into the existing preferences. "
-                    "Return ONLY the updated markdown, no explanation."
+                    "You maintain a concise user preferences list for AI data analysis responses. "
+                    "Merge the new feedback into the existing list as short, actionable bullet points. "
+                    "Rules: each bullet is one clear instruction (e.g. '- Always include percentage breakdowns'). "
+                    "Max 8 bullets total. No headers, no explanations, no examples — bullets only. "
+                    "Return ONLY the updated bullet list."
                 ),
             },
             {
                 "role": "user",
                 "content": (
-                    f"Current preferences:\n{current_preferences_md}\n\n"
+                    f"Current preferences:\n{current_preferences_md or '(none yet)'}\n\n"
                     f"New feedback: {comment}"
                 ),
             },
         ],
-        max_tokens=400,
+        max_tokens=200,
     )
     content = response.choices[0].message.content
     updated_md = content.strip() if content else current_preferences_md
