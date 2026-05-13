@@ -13,8 +13,8 @@ An AI-powered CSV/Excel analyser. Upload spreadsheets, preview data, and ask nat
 
 ## Prerequisites
 
-- [Nix](https://nixos.org/) — provides Python 3.11 and uv for the backend
-- [Node.js + yarn](https://yarnpkg.com/) — for the frontend
+- Python 3.11+ and [uv](https://docs.astral.sh/uv/)
+- [Node.js + yarn](https://yarnpkg.com/)
 - An OpenAI API key
 
 ## Setup
