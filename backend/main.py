@@ -1,18 +1,19 @@
 from __future__ import annotations
 
+from dotenv import load_dotenv
+
+load_dotenv()  # must run before any module that reads env vars at import time
+
 import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from services.db import Base, engine
 from routers import upload, data, query, history, feedback
-
-load_dotenv()  # loads backend/.env
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
