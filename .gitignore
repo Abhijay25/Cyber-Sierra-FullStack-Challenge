@@ -1,6 +1,7 @@
 .env
 __pycache__
 *.pyc
+*.log
 node_modules
 .next
 *.db
@@ -9,4 +10,4 @@ node_modules
 out/
 backend/static/
 backend/.env
-backend/pandasai.log
+docs/superpowers/
