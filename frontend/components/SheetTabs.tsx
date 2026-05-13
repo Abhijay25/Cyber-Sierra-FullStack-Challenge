@@ -6,9 +6,10 @@ interface Props {
   sheets: SheetMeta[]
   activeSheet: string | null
   onSelect: (sheetName: string) => void
+  onDelete: (sheetName: string) => void
 }
 
-export default function SheetTabs({ sheets, activeSheet, onSelect }: Props) {
+export default function SheetTabs({ sheets, activeSheet, onSelect, onDelete }: Props) {
   if (sheets.length === 0) return null
 
   return (
@@ -26,33 +27,58 @@ export default function SheetTabs({ sheets, activeSheet, onSelect }: Props) {
       {sheets.map((sheet) => {
         const isActive = sheet.name === activeSheet
         return (
-          <button
+          <div
             key={sheet.name}
-            role="tab"
-            aria-selected={isActive}
-            onClick={() => onSelect(sheet.name)}
             style={{
-              padding: '8px 16px',
-              border: 'none',
-              borderBottom: isActive ? '2px solid #0070f3' : '2px solid transparent',
-              background: 'none',
-              cursor: 'pointer',
-              fontWeight: isActive ? 700 : 400,
-              color: isActive ? '#0070f3' : '#444',
-              fontSize: 14,
               display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-start',
-              lineHeight: 1.4,
+              alignItems: 'stretch',
+              borderBottom: isActive ? '2px solid #0070f3' : '2px solid transparent',
               marginBottom: -2,
-              transition: 'color 0.15s',
             }}
           >
-            <span>{sheet.name}</span>
-            <span style={{ fontSize: 11, color: '#999', fontWeight: 400 }}>
-              {sheet.row_count.toLocaleString()} rows
-            </span>
-          </button>
+            <button
+              role="tab"
+              aria-selected={isActive}
+              onClick={() => onSelect(sheet.name)}
+              style={{
+                padding: '8px 10px 8px 16px',
+                border: 'none',
+                background: 'none',
+                cursor: 'pointer',
+                fontWeight: isActive ? 700 : 400,
+                color: isActive ? '#0070f3' : '#444',
+                fontSize: 14,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                lineHeight: 1.4,
+                transition: 'color 0.15s',
+              }}
+            >
+              <span>{sheet.name}</span>
+              <span style={{ fontSize: 11, color: '#999', fontWeight: 400 }}>
+                {sheet.row_count.toLocaleString()} rows
+              </span>
+            </button>
+            <button
+              aria-label={`Delete ${sheet.name}`}
+              onClick={(e) => { e.stopPropagation(); onDelete(sheet.name) }}
+              style={{
+                border: 'none',
+                background: 'none',
+                cursor: 'pointer',
+                color: '#bbb',
+                fontSize: 13,
+                padding: '0 10px 0 2px',
+                lineHeight: 1,
+                alignSelf: 'center',
+              }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#d9534f' }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#bbb' }}
+            >
+              ×
+            </button>
+          </div>
         )
       })}
     </div>

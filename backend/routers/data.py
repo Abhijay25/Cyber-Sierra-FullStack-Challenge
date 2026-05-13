@@ -8,6 +8,7 @@ from fastapi.responses import JSONResponse
 
 from services import session_store
 from services.limiter import limiter
+from services.session_store import delete_sheet
 
 router = APIRouter(tags=["data"])
 
@@ -91,3 +92,34 @@ async def get_data(
             "columns": columns,
         },
     )
+
+
+@router.delete("/sheets/{sheet_name:path}")
+@limiter.limit("30/minute")
+async def delete_sheet_endpoint(
+    request: Request,
+    sheet_name: str,
+    session_id: str | None = Cookie(None),
+) -> JSONResponse:
+    if session_id is None:
+        return JSONResponse(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            content={"detail": "session_id cookie is required"},
+        )
+
+    sheet_name = unquote(sheet_name)
+
+    if not sheet_name or len(sheet_name) > MAX_SHEET_NAME_LEN:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"detail": "Invalid sheet name."},
+        )
+
+    removed = delete_sheet(session_id, sheet_name)
+    if not removed:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"detail": f"Sheet '{sheet_name}' not found"},
+        )
+
+    return JSONResponse(status_code=status.HTTP_200_OK, content={"deleted": sheet_name})

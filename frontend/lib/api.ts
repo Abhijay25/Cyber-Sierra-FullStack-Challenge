@@ -173,6 +173,13 @@ export async function querySheetStream(
   }
 }
 
+export async function deleteSheet(sheetName: string): Promise<void> {
+  const encodedSheet = encodeURIComponent(sheetName)
+  await jsonFetch<{ deleted: string }>(`/api/sheets/${encodedSheet}`, {
+    method: 'DELETE',
+  })
+}
+
 export async function getHistory(): Promise<HistoryResponse> {
   return jsonFetch<HistoryResponse>('/api/history', {
     method: 'GET',

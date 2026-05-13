@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import type { SheetMeta, Turn } from '@/lib/api'
+import { deleteSheet } from '@/lib/api'
 import FileUpload from '@/components/FileUpload'
 import SheetTabs from '@/components/SheetTabs'
 import DataPreview from '@/components/DataPreview'
@@ -16,6 +17,27 @@ export default function Home() {
   const [reuseQuestion, setReuseQuestion] = useState('')
   const [previewN, setPreviewN] = useState(25)
   const [sheetConversations, setSheetConversations] = useState<Record<string, Turn[]>>({})
+
+  const handleDelete = async (sheetName: string) => {
+    try {
+      await deleteSheet(sheetName)
+    } catch { /* best-effort — remove from UI regardless */ }
+
+    setSheets(prev => {
+      const next = prev.filter(s => s.name !== sheetName)
+      if (activeSheet === sheetName) {
+        const idx = prev.findIndex(s => s.name === sheetName)
+        const nextActive = next[idx] ?? next[idx - 1] ?? null
+        setActiveSheet(nextActive?.name ?? null)
+      }
+      return next
+    })
+    setSheetConversations(prev => {
+      const next = { ...prev }
+      delete next[sheetName]
+      return next
+    })
+  }
 
   const handleUpload = (newSheets: SheetMeta[]) => {
     setSheets(prev => {
@@ -93,7 +115,7 @@ export default function Home() {
 
       {hasFiles && (
         <>
-          <SheetTabs sheets={sheets} activeSheet={activeSheet} onSelect={setActiveSheet} />
+          <SheetTabs sheets={sheets} activeSheet={activeSheet} onSelect={setActiveSheet} onDelete={(name) => { void handleDelete(name) }} />
           {activeSheet && (
             <DataPreview
               sheetName={activeSheet}

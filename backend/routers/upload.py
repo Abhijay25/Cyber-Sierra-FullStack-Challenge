@@ -24,6 +24,7 @@ ALLOWED_MIMES = {
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 }
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
+MAX_SHEETS_PER_SESSION = 15
 
 
 @router.post("/upload")
@@ -119,6 +120,20 @@ async def upload(
 
     # Use existing session_id if present, otherwise generate new one
     sid = session_id if session_id else str(uuid.uuid4())
+
+    # Enforce sheet cap
+    existing = session_store.get_sheet_meta(sid)
+    existing_names = {s["name"] for s in existing}
+    new_names = set(parsed_sheets.keys()) - existing_names
+    if len(existing_names) + len(new_names) > MAX_SHEETS_PER_SESSION:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "detail": f"Session already has {len(existing_names)} sheet(s). "
+                f"Adding these files would exceed the {MAX_SHEETS_PER_SESSION}-sheet limit. "
+                "Delete some sheets first."
+            },
+        )
 
     # Store sheets in session
     session_store.set_sheets(sid, parsed_sheets)

@@ -50,6 +50,18 @@ def get_sheet(session_id: str, sheet_name: str) -> pd.DataFrame | None:
     return entry["sheets"].get(sheet_name)
 
 
+def delete_sheet(session_id: str, sheet_name: str) -> bool:
+    from services.ai_pipeline import clear_session_agents
+
+    _touch(session_id)
+    entry = _store.get(session_id)
+    if entry is None or sheet_name not in entry["sheets"]:
+        return False
+    del entry["sheets"][sheet_name]
+    clear_session_agents(session_id)
+    return True
+
+
 def get_sheet_meta(session_id: str) -> list[dict]:
     _touch(session_id)
     entry = _store.get(session_id)
