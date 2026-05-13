@@ -5,11 +5,13 @@ import type { SheetMeta } from '@/lib/api'
 import FileUpload from '@/components/FileUpload'
 import SheetTabs from '@/components/SheetTabs'
 import DataPreview from '@/components/DataPreview'
+import QueryInterface from '@/components/QueryInterface'
 
 export default function Home() {
   const [sheets, setSheets] = useState<SheetMeta[]>([])
   const [activeSheet, setActiveSheet] = useState<string | null>(null)
   const [isUploading, setIsUploading] = useState(false)
+  const [historyOpen, setHistoryOpen] = useState(false)
 
   const handleUpload = (newSheets: SheetMeta[]) => {
     setSheets(prev => {
@@ -33,6 +35,12 @@ export default function Home() {
         <>
           <SheetTabs sheets={sheets} activeSheet={activeSheet} onSelect={setActiveSheet} />
           {activeSheet && <DataPreview sheetName={activeSheet} />}
+          {activeSheet && (
+            <QueryInterface
+              sheetName={activeSheet}
+              onHistoryOpen={() => setHistoryOpen(true)}
+            />
+          )}
         </>
       )}
     </main>
