@@ -7,6 +7,11 @@ backend.egg-info/requires.txt
 backend.egg-info/top_level.txt
 routers/__init__.py
 routers/data.py
+routers/feedback.py
+routers/history.py
+routers/query.py
 routers/upload.py
 services/__init__.py
+services/ai_pipeline.py
+services/db.py
 services/session_store.py

@@ -16,6 +16,7 @@ dependencies = [
     "pandasai>=3.0.0",
     "python-dotenv>=1.2.2",
     "python-multipart>=0.0.28",
+    "slowapi>=0.1.9",
     "sqlalchemy>=2.0.49",
     "uvicorn[standard]>=0.46.0",
 ]

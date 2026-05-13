@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import re
 import uuid
 from io import BytesIO
@@ -8,6 +9,8 @@ from pathlib import Path
 import pandas as pd
 from fastapi import APIRouter, Cookie, HTTPException, UploadFile, status
 from fastapi.responses import JSONResponse
+
+SECURE_COOKIES = os.getenv("ENVIRONMENT", "development").lower() == "production"
 
 from services import session_store
 
@@ -135,6 +138,8 @@ async def upload(
         value=sid,
         httponly=True,
         samesite="lax",
+        secure=SECURE_COOKIES,
+        max_age=86400,  # 24 hours
         path="/",
     )
 
