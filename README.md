@@ -46,14 +46,13 @@ Starts FastAPI on `http://localhost:8000` and Next.js on `http://localhost:3000`
 ```
 Browser
   └── Next.js (localhost:3000)
-        └── fetch() with credentials
-              └── FastAPI (localhost:8000)
-                    ├── /api/upload     — parse files, store DataFrames in memory
-                    ├── /api/sheets     — list sheet metadata for session
-                    ├── /api/data/{sheet} — preview N rows
-                    ├── /api/query      — run AI pipeline, persist to SQLite
-                    ├── /api/feedback   — save thumbs up/down, update preferences
-                    └── /api/history    — retrieve past prompts for session
+        └── FastAPI (localhost:8000)
+              ├── /api/upload          parse files, store DataFrames
+              ├── /api/sheets          list sheet metadata
+              ├── /api/data/{sheet}    preview N rows
+              ├── /api/query           run AI pipeline, save to SQLite
+              ├── /api/feedback        record thumbs up/down, update prefs
+              └── /api/history         retrieve past prompts
 ```
 
 ### AI pipeline (per query)
