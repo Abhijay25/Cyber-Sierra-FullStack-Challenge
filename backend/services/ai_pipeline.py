@@ -96,7 +96,7 @@ async def _openai_rewrite(
         f"\n"
         f"IF NOT answerable (question is off-topic, references a column that doesn't exist, "
         f"or is nonsensical with respect to this dataset):\n"
-        f"- Respond EXACTLY: {_NOT_APPLICABLE} <one-sentence reason>\n"
+        f"- Respond EXACTLY: {_NOT_APPLICABLE} <short specific reason — name what's missing or why it's off-topic; do NOT say 'cannot be answered from the dataset'>\n"
         f"\n"
         f"Return ONLY the pandas instruction OR the {_NOT_APPLICABLE} line. No code, no extra text."
         f"{prefs_section}"
@@ -184,7 +184,7 @@ async def _openai_format_stream(
     """Step 2.5: Stream the formatted answer token by token."""
     if raw_result.startswith(_NOT_APPLICABLE):
         reason = raw_result[len(_NOT_APPLICABLE):].strip()
-        yield f"This question cannot be answered from the dataset. {reason}"
+        yield f"This dataset doesn't contain that information — {reason}"
         return
 
     prefs_section = (
