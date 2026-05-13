@@ -4,7 +4,8 @@ from fastapi import APIRouter, Cookie, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
-from models import FeedbackRequest, Prompt
+from models import FeedbackRequest, Prompt, Session as SessionModel
+from services.ai_pipeline import update_preferences
 from services.db import get_db
 
 router = APIRouter(prefix="/api", tags=["feedback"])
@@ -56,6 +57,16 @@ async def submit_feedback(
     except Exception:
         db.rollback()
         raise HTTPException(status_code=500, detail="Failed to save feedback")
+
+    # On downvote with a comment, merge feedback into preferences
+    if request.feedback == "down" and request.comment:
+        session_row = (
+            db.query(SessionModel)
+            .filter(SessionModel.session_id == session_id)
+            .first()
+        )
+        current_prefs = session_row.preferences_md if session_row is not None else ""
+        await update_preferences(session_id, request.comment, current_prefs, db)
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,
