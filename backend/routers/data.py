@@ -58,8 +58,7 @@ async def get_data(
     # URL-decode the sheet_name
     sheet_name = unquote(sheet_name)
 
-    # Clamp n to valid range
-    n = max(1, min(n, 500))
+    n = max(1, n)
 
     # Get sheet
     df = session_store.get_sheet(session_id, sheet_name)

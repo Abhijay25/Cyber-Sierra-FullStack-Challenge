@@ -47,9 +47,8 @@ export default function Home() {
               <input
                 type="number"
                 min={1}
-                max={500}
                 value={previewN}
-                onChange={(e) => setPreviewN(Math.min(500, Math.max(1, Number(e.target.value))))}
+                onChange={(e) => setPreviewN(Math.max(1, Number(e.target.value)))}
                 style={{
                   width: 64,
                   padding: '4px 6px',

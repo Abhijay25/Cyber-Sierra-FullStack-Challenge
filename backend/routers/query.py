@@ -38,8 +38,7 @@ async def query(
         )
 
     if request.n is not None:
-        n = max(1, min(request.n, 500))
-        df = df.head(n)
+        df = df.head(max(1, request.n))
 
     # Get preferences from DB; default to empty string
     session_row = (
