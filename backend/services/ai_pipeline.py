@@ -66,25 +66,39 @@ class _OpenAIAdapter(LLM):
 # ---------------------------------------------------------------------------
 
 
+_NOT_APPLICABLE = "__NOT_APPLICABLE__:"
+
+
 async def _openai_rewrite(
     question: str,
     columns: list[str],
     preferences_md: str,
     history: list[dict[str, str]],
 ) -> str:
-    """Step 1: Rewrite the question as a precise pandas-friendly instruction."""
+    """Step 1: Rewrite the question as a precise pandas-friendly instruction.
+
+    Returns a string starting with _NOT_APPLICABLE if the question cannot be
+    answered from the available columns (off-topic, nonexistent column, nonsense).
+    """
     column_list = ", ".join(columns)
     prefs_section = f"\nUser preferences to apply:\n{preferences_md}" if preferences_md else ""
     system_prompt = (
-        f"You are a data analysis assistant. Convert the user's question into a minimal, "
-        f"precise pandas instruction for a DataFrame with columns: {column_list}.\n"
-        f"Rules:\n"
-        f"- Name the exact column(s) to use.\n"
-        f"- Specify the exact operation (mean, count, sum, value_counts, etc.).\n"
+        f"You are a data analysis assistant. The DataFrame has these columns: {column_list}.\n"
+        f"Decide whether the user's question can be answered from these columns, then:\n"
+        f"\n"
+        f"IF answerable from the data:\n"
+        f"- Rewrite as a minimal, precise pandas instruction naming the exact column(s) and operation.\n"
         f"- If the answer is a single number, say 'return a single scalar value'.\n"
         f"- Do NOT add distributions, groupings, or percentages unless the user explicitly asked.\n"
+        f"- Do NOT map unrelated concepts to existing columns "
+        f"  (e.g. 'salary' is NOT 'Fare', 'dragons' is not a real column).\n"
         f"- Use prior conversation turns only to resolve pronouns like 'that', 'it', 'those'.\n"
-        f"Return ONLY the instruction, no code, no explanation."
+        f"\n"
+        f"IF NOT answerable (question is off-topic, references a column that doesn't exist, "
+        f"or is nonsensical with respect to this dataset):\n"
+        f"- Respond EXACTLY: {_NOT_APPLICABLE} <one-sentence reason>\n"
+        f"\n"
+        f"Return ONLY the pandas instruction OR the {_NOT_APPLICABLE} line. No code, no extra text."
         f"{prefs_section}"
     )
     messages: list[dict[str, str]] = [{"role": "system", "content": system_prompt}]
@@ -168,7 +182,11 @@ async def _openai_format_stream(
     history: list[dict[str, str]],
 ):
     """Step 2.5: Stream the formatted answer token by token."""
-    from typing import AsyncGenerator
+    if raw_result.startswith(_NOT_APPLICABLE):
+        reason = raw_result[len(_NOT_APPLICABLE):].strip()
+        yield f"This question cannot be answered from the dataset. {reason}"
+        return
+
     prefs_section = (
         f"\n\nApply these user style preferences to your answer:\n{preferences_md}"
         if preferences_md else ""
@@ -217,6 +235,10 @@ async def run_pipeline_compute(
 
     refined_prompt = await _openai_rewrite(question, columns, preferences_md, hist)
     logger.info("Refined prompt: %s", refined_prompt)
+
+    if refined_prompt.startswith(_NOT_APPLICABLE):
+        reason = refined_prompt[len(_NOT_APPLICABLE):].strip()
+        return refined_prompt, f"{_NOT_APPLICABLE} {reason}"
 
     try:
         raw_result = await asyncio.to_thread(_run_pandasai, df, refined_prompt)
