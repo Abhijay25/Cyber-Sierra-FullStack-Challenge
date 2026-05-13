@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from urllib.parse import unquote
 
 from fastapi import APIRouter, Cookie, status
@@ -68,9 +69,8 @@ async def get_data(
             content={"detail": f"Sheet '{sheet_name}' not found"},
         )
 
-    # Get first n rows as dicts; replace NaN/inf with None for JSON compliance
-    slice_ = df.head(n)
-    rows = slice_.where(slice_.notna(), other=None).to_dict(orient="records")
+    # pandas .to_json handles NaN→null natively; json.loads converts null→None
+    rows = json.loads(df.head(n).to_json(orient="records", date_format="iso"))
     # Fix D: Cast column names to strings
     columns = [str(c) for c in df.columns]
 
