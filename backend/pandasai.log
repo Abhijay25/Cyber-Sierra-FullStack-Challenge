@@ -865,3 +865,732 @@ age_stats_df = execute_sql_query(sql_query)
 result = {'type': 'dataframe', 'value': age_stats_df}
 2026-05-13 16:06:11 [INFO] Response generated successfully.
 2026-05-13 16:06:13 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-13 16:11:36 [INFO] Question: df['Age'].mean()
+2026-05-13 16:11:36 [INFO] Running PandasAI with openai LLM...
+2026-05-13 16:11:36 [INFO] Prompt ID: 3036ed60-af1d-4ff5-b8d6-df654059986d
+2026-05-13 16:11:36 [INFO] Generating new code...
+2026-05-13 16:11:36 [INFO] Using Prompt: <tables>
+
+<table dialect="duckdb" table_name="table_aec7a6bd6f78cb97d53618ce510b61d8" columns="[{"name": "PassengerId", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Survived", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Pclass", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Name", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Sex", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Age", "type": "float", "description": null, "expression": null, "alias": null}, {"name": "SibSp", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Parch", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Ticket", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Fare", "type": "float", "description": null, "expression": null, "alias": null}, {"name": "Cabin", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Embarked", "type": "string", "description": null, "expression": null, "alias": null}]" dimensions="891x12">
+PassengerId,Survived,Pclass,Name,Sex,Age,SibSp,Parch,Ticket,Fare,Cabin,Embarked
+1,0,3,"Braund, Mr. Owen Harris",male,22.0,1,0,A/5 21171,7.25,,S
+2,1,1,"Cumings, Mrs. John Bradley (Florence Briggs Thayer)",female,38.0,1,0,PC 17599,71.2833,C85,C
+3,1,3,"Heikkinen, Miss. Laina",female,26.0,0,0,STON/O2. 3101282,7.925,,S
+4,1,1,"Futrelle, Mrs. Jacques Heath (Lily May Peel)",female,35.0,1,0,113803,53.1,C123,S
+5,0,3,"Allen, Mr. William Henry",male,35.0,0,0,373450,8.05,,S
+</table>
+
+
+</tables>
+
+The following functions have already been provided. Please use them as needed and do not redefine them.
+<function>
+def execute_sql_query(sql_query: str) -> pd.DataFrame
+    """This method connects to the database, executes the sql query and returns the dataframe"""
+</function>
+
+
+
+Update this initial code:
+```python
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+
+# Declare result var: 
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+```
+
+
+
+### QUERY
+ df['Age'].mean()
+
+At the end, declare "result" variable as a dictionary of type and value in the following format:
+
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+
+
+Generate python code and return full updated code:
+
+### Note: Use only relevant table for query and do aggregation, sorting, joins and grouby through sql query
+2026-05-13 16:11:38 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-13 16:11:38 [INFO] Code Generated:
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+
+# SQL query to calculate the mean age of passengers
+sql_query = "SELECT AVG(Age) as mean_age FROM table_aec7a6bd6f78cb97d53618ce510b61d8"
+
+# Execute the SQL query and store the result in a DataFrame
+df_result = execute_sql_query(sql_query)
+
+# Get the mean age from the DataFrame
+mean_age = df_result['mean_age'].iloc[0]
+
+# Declare result var: 
+result = { "type": "number", "value": mean_age }
+2026-05-13 16:11:38 [INFO] Validating code requirements...
+2026-05-13 16:11:38 [INFO] Code validation successful.
+2026-05-13 16:11:38 [INFO] Cleaning the generated code...
+2026-05-13 16:11:38 [INFO] Executing code: import pandas as pd
+sql_query = 'SELECT AVG(Age) as mean_age FROM table_aec7a6bd6f78cb97d53618ce510b61d8'
+df_result = execute_sql_query(sql_query)
+mean_age = df_result['mean_age'].iloc[0]
+result = {'type': 'number', 'value': mean_age}
+2026-05-13 16:11:38 [INFO] Response generated successfully.
+2026-05-13 16:11:39 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-13 16:11:52 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-13 16:11:52 [INFO] Refined prompt: `df[df['Sex'] == 'male']['Age'].mean()`
+2026-05-13 16:11:52 [INFO] Question: `df[df['Sex'] == 'male']['Age'].mean()`
+2026-05-13 16:11:52 [INFO] Running PandasAI with openai LLM...
+2026-05-13 16:11:52 [INFO] Prompt ID: 6cc6e6f8-6efb-465d-91ea-d094cb166dee
+2026-05-13 16:11:52 [INFO] Generating new code...
+2026-05-13 16:11:52 [INFO] Using Prompt: <tables>
+
+<table dialect="duckdb" table_name="table_aec7a6bd6f78cb97d53618ce510b61d8" columns="[{"name": "PassengerId", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Survived", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Pclass", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Name", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Sex", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Age", "type": "float", "description": null, "expression": null, "alias": null}, {"name": "SibSp", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Parch", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Ticket", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Fare", "type": "float", "description": null, "expression": null, "alias": null}, {"name": "Cabin", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Embarked", "type": "string", "description": null, "expression": null, "alias": null}]" dimensions="891x12">
+PassengerId,Survived,Pclass,Name,Sex,Age,SibSp,Parch,Ticket,Fare,Cabin,Embarked
+1,0,3,"Braund, Mr. Owen Harris",male,22.0,1,0,A/5 21171,7.25,,S
+2,1,1,"Cumings, Mrs. John Bradley (Florence Briggs Thayer)",female,38.0,1,0,PC 17599,71.2833,C85,C
+3,1,3,"Heikkinen, Miss. Laina",female,26.0,0,0,STON/O2. 3101282,7.925,,S
+4,1,1,"Futrelle, Mrs. Jacques Heath (Lily May Peel)",female,35.0,1,0,113803,53.1,C123,S
+5,0,3,"Allen, Mr. William Henry",male,35.0,0,0,373450,8.05,,S
+</table>
+
+
+</tables>
+
+The following functions have already been provided. Please use them as needed and do not redefine them.
+<function>
+def execute_sql_query(sql_query: str) -> pd.DataFrame
+    """This method connects to the database, executes the sql query and returns the dataframe"""
+</function>
+
+
+
+Update this initial code:
+```python
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+
+# Declare result var: 
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+```
+
+
+
+### QUERY
+ `df[df['Sex'] == 'male']['Age'].mean()`
+
+At the end, declare "result" variable as a dictionary of type and value in the following format:
+
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+
+
+Generate python code and return full updated code:
+
+### Note: Use only relevant table for query and do aggregation, sorting, joins and grouby through sql query
+2026-05-13 16:11:55 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-13 16:11:55 [INFO] Code Generated:
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+
+# SQL query to calculate the mean age of male passengers.
+sql_query = """
+SELECT AVG(Age) AS mean_age
+FROM table_aec7a6bd6f78cb97d53618ce510b61d8
+WHERE Sex = 'male'
+"""
+
+# Execute the SQL query and retrieve the result into a DataFrame
+result_df = execute_sql_query(sql_query)
+
+# Extract the mean age value from the DataFrame
+mean_age = result_df['mean_age'].iloc[0]
+
+# Declare result var
+result = {
+    "type": "number",
+    "value": mean_age
+}
+2026-05-13 16:11:55 [INFO] Validating code requirements...
+2026-05-13 16:11:55 [INFO] Code validation successful.
+2026-05-13 16:11:55 [INFO] Cleaning the generated code...
+2026-05-13 16:11:55 [INFO] Executing code: import pandas as pd
+sql_query = """
+SELECT AVG(Age) AS mean_age
+FROM table_aec7a6bd6f78cb97d53618ce510b61d8
+WHERE Sex = 'male'
+"""
+result_df = execute_sql_query(sql_query)
+mean_age = result_df['mean_age'].iloc[0]
+result = {'type': 'number', 'value': mean_age}
+2026-05-13 16:11:55 [INFO] Response generated successfully.
+2026-05-13 16:11:56 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-13 16:12:17 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-13 16:12:27 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-13 16:12:27 [INFO] Refined prompt: df['Fare'].mean()
+2026-05-13 16:12:27 [INFO] Question: df['Fare'].mean()
+2026-05-13 16:12:27 [INFO] Running PandasAI with openai LLM...
+2026-05-13 16:12:27 [INFO] Prompt ID: 19ea74e6-0d2d-4b75-9169-297644183f40
+2026-05-13 16:12:27 [INFO] Generating new code...
+2026-05-13 16:12:28 [INFO] Using Prompt: <tables>
+
+<table dialect="duckdb" table_name="table_aec7a6bd6f78cb97d53618ce510b61d8" columns="[{"name": "PassengerId", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Survived", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Pclass", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Name", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Sex", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Age", "type": "float", "description": null, "expression": null, "alias": null}, {"name": "SibSp", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Parch", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Ticket", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Fare", "type": "float", "description": null, "expression": null, "alias": null}, {"name": "Cabin", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Embarked", "type": "string", "description": null, "expression": null, "alias": null}]" dimensions="891x12">
+PassengerId,Survived,Pclass,Name,Sex,Age,SibSp,Parch,Ticket,Fare,Cabin,Embarked
+1,0,3,"Braund, Mr. Owen Harris",male,22.0,1,0,A/5 21171,7.25,,S
+2,1,1,"Cumings, Mrs. John Bradley (Florence Briggs Thayer)",female,38.0,1,0,PC 17599,71.2833,C85,C
+3,1,3,"Heikkinen, Miss. Laina",female,26.0,0,0,STON/O2. 3101282,7.925,,S
+4,1,1,"Futrelle, Mrs. Jacques Heath (Lily May Peel)",female,35.0,1,0,113803,53.1,C123,S
+5,0,3,"Allen, Mr. William Henry",male,35.0,0,0,373450,8.05,,S
+</table>
+
+
+</tables>
+
+The following functions have already been provided. Please use them as needed and do not redefine them.
+<function>
+def execute_sql_query(sql_query: str) -> pd.DataFrame
+    """This method connects to the database, executes the sql query and returns the dataframe"""
+</function>
+
+
+
+Update this initial code:
+```python
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+
+# Declare result var: 
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+```
+
+
+
+### QUERY
+ df['Fare'].mean()
+
+At the end, declare "result" variable as a dictionary of type and value in the following format:
+
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+
+
+Generate python code and return full updated code:
+
+### Note: Use only relevant table for query and do aggregation, sorting, joins and grouby through sql query
+2026-05-13 16:12:30 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-13 16:12:30 [INFO] Code Generated:
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+# Define SQL query to calculate the mean of the 'Fare' column
+sql_query = """
+SELECT AVG(Fare) AS average_fare
+FROM table_aec7a6bd6f78cb97d53618ce510b61d8
+"""
+
+# Execute the SQL query using the provided function
+result_df = execute_sql_query(sql_query)
+
+# Extract the mean 'Fare' from the result dataframe
+average_fare = result_df['average_fare'][0]
+
+# Declare result variable, specifying the type and value
+result = { "type": "number", "value": average_fare }
+2026-05-13 16:12:30 [INFO] Validating code requirements...
+2026-05-13 16:12:30 [INFO] Code validation successful.
+2026-05-13 16:12:30 [INFO] Cleaning the generated code...
+2026-05-13 16:12:30 [INFO] Executing code: import pandas as pd
+sql_query = """
+SELECT AVG(Fare) AS average_fare
+FROM table_aec7a6bd6f78cb97d53618ce510b61d8
+"""
+result_df = execute_sql_query(sql_query)
+average_fare = result_df['average_fare'][0]
+result = {'type': 'number', 'value': average_fare}
+2026-05-13 16:12:30 [INFO] Response generated successfully.
+2026-05-13 16:12:31 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-13 16:13:04 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-13 16:13:04 [INFO] Refined prompt: Filter the DataFrame where ['Survived'] == 1 and ['Sex'] == 'female', then use .shape[0] to return a single scalar value.
+2026-05-13 16:13:04 [INFO] Question: Filter the DataFrame where ['Survived'] == 1 and ['Sex'] == 'female', then use .shape[0] to return a single scalar value.
+2026-05-13 16:13:04 [INFO] Running PandasAI with openai LLM...
+2026-05-13 16:13:04 [INFO] Prompt ID: 36f9a98d-e0c2-4ab0-a6d8-e3d5efebb782
+2026-05-13 16:13:04 [INFO] Generating new code...
+2026-05-13 16:13:04 [INFO] Using Prompt: <tables>
+
+<table dialect="duckdb" table_name="table_aec7a6bd6f78cb97d53618ce510b61d8" columns="[{"name": "PassengerId", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Survived", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Pclass", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Name", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Sex", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Age", "type": "float", "description": null, "expression": null, "alias": null}, {"name": "SibSp", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Parch", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Ticket", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Fare", "type": "float", "description": null, "expression": null, "alias": null}, {"name": "Cabin", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Embarked", "type": "string", "description": null, "expression": null, "alias": null}]" dimensions="891x12">
+PassengerId,Survived,Pclass,Name,Sex,Age,SibSp,Parch,Ticket,Fare,Cabin,Embarked
+1,0,3,"Braund, Mr. Owen Harris",male,22.0,1,0,A/5 21171,7.25,,S
+2,1,1,"Cumings, Mrs. John Bradley (Florence Briggs Thayer)",female,38.0,1,0,PC 17599,71.2833,C85,C
+3,1,3,"Heikkinen, Miss. Laina",female,26.0,0,0,STON/O2. 3101282,7.925,,S
+4,1,1,"Futrelle, Mrs. Jacques Heath (Lily May Peel)",female,35.0,1,0,113803,53.1,C123,S
+5,0,3,"Allen, Mr. William Henry",male,35.0,0,0,373450,8.05,,S
+</table>
+
+
+</tables>
+
+The following functions have already been provided. Please use them as needed and do not redefine them.
+<function>
+def execute_sql_query(sql_query: str) -> pd.DataFrame
+    """This method connects to the database, executes the sql query and returns the dataframe"""
+</function>
+
+
+
+Update this initial code:
+```python
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+
+# Declare result var: 
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+```
+
+
+
+### QUERY
+ Filter the DataFrame where ['Survived'] == 1 and ['Sex'] == 'female', then use .shape[0] to return a single scalar value.
+
+At the end, declare "result" variable as a dictionary of type and value in the following format:
+
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+
+
+Generate python code and return full updated code:
+
+### Note: Use only relevant table for query and do aggregation, sorting, joins and grouby through sql query
+2026-05-13 16:13:06 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-13 16:13:06 [INFO] Code Generated:
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+
+# Query to filter the DataFrame where ['Survived'] == 1 and ['Sex'] == 'female'
+sql_query = """
+SELECT COUNT(*) as count_female_survivors
+FROM table_aec7a6bd6f78cb97d53618ce510b61d8
+WHERE Survived = 1 AND Sex = 'female';
+"""
+
+# Execute the SQL query
+result_df = execute_sql_query(sql_query)
+
+# Extract the scalar value
+number_of_female_survivors = result_df.iloc[0]['count_female_survivors']
+
+# Declare result variable
+result = { "type": "number", "value": number_of_female_survivors }
+2026-05-13 16:13:06 [INFO] Validating code requirements...
+2026-05-13 16:13:06 [INFO] Code validation successful.
+2026-05-13 16:13:06 [INFO] Cleaning the generated code...
+2026-05-13 16:13:06 [INFO] Executing code: import pandas as pd
+sql_query = """
+SELECT COUNT(*) as count_female_survivors
+FROM table_aec7a6bd6f78cb97d53618ce510b61d8
+WHERE Survived = 1 AND Sex = 'female';
+"""
+result_df = execute_sql_query(sql_query)
+number_of_female_survivors = result_df.iloc[0]['count_female_survivors']
+result = {'type': 'number', 'value': number_of_female_survivors}
+2026-05-13 16:13:06 [INFO] Response generated successfully.
+2026-05-13 16:13:07 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-13 16:13:20 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-13 16:13:20 [INFO] Refined prompt: `df[df['Sex'] == 'male']['Survived'].sum()`
+2026-05-13 16:13:20 [INFO] Question: `df[df['Sex'] == 'male']['Survived'].sum()`
+2026-05-13 16:13:20 [INFO] Running PandasAI with openai LLM...
+2026-05-13 16:13:20 [INFO] Prompt ID: 96000341-c939-4c04-81fe-ca5ff512d1d5
+2026-05-13 16:13:20 [INFO] Generating new code...
+2026-05-13 16:13:20 [INFO] Using Prompt: <tables>
+
+<table dialect="duckdb" table_name="table_aec7a6bd6f78cb97d53618ce510b61d8" columns="[{"name": "PassengerId", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Survived", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Pclass", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Name", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Sex", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Age", "type": "float", "description": null, "expression": null, "alias": null}, {"name": "SibSp", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Parch", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Ticket", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Fare", "type": "float", "description": null, "expression": null, "alias": null}, {"name": "Cabin", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Embarked", "type": "string", "description": null, "expression": null, "alias": null}]" dimensions="891x12">
+PassengerId,Survived,Pclass,Name,Sex,Age,SibSp,Parch,Ticket,Fare,Cabin,Embarked
+1,0,3,"Braund, Mr. Owen Harris",male,22.0,1,0,A/5 21171,7.25,,S
+2,1,1,"Cumings, Mrs. John Bradley (Florence Briggs Thayer)",female,38.0,1,0,PC 17599,71.2833,C85,C
+3,1,3,"Heikkinen, Miss. Laina",female,26.0,0,0,STON/O2. 3101282,7.925,,S
+4,1,1,"Futrelle, Mrs. Jacques Heath (Lily May Peel)",female,35.0,1,0,113803,53.1,C123,S
+5,0,3,"Allen, Mr. William Henry",male,35.0,0,0,373450,8.05,,S
+</table>
+
+
+</tables>
+
+The following functions have already been provided. Please use them as needed and do not redefine them.
+<function>
+def execute_sql_query(sql_query: str) -> pd.DataFrame
+    """This method connects to the database, executes the sql query and returns the dataframe"""
+</function>
+
+
+
+Update this initial code:
+```python
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+
+# Declare result var: 
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+```
+
+
+
+### QUERY
+ `df[df['Sex'] == 'male']['Survived'].sum()`
+
+At the end, declare "result" variable as a dictionary of type and value in the following format:
+
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+
+
+Generate python code and return full updated code:
+
+### Note: Use only relevant table for query and do aggregation, sorting, joins and grouby through sql query
+2026-05-13 16:13:24 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-13 16:13:24 [INFO] Code Generated:
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+# SQL query to count male passengers who survived
+sql_query = """
+SELECT SUM(Survived) AS SurvivedMaleCount
+FROM table_aec7a6bd6f78cb97d53618ce510b61d8
+WHERE Sex = 'male'
+"""
+
+# Execute the query
+survived_male_count_df = execute_sql_query(sql_query)
+
+# Extract the count result
+survived_male_count = survived_male_count_df['SurvivedMaleCount'].iloc[0]
+
+# Declare result var
+result = { "type": "number", "value": survived_male_count }
+2026-05-13 16:13:24 [INFO] Validating code requirements...
+2026-05-13 16:13:24 [INFO] Code validation successful.
+2026-05-13 16:13:24 [INFO] Cleaning the generated code...
+2026-05-13 16:13:24 [INFO] Executing code: import pandas as pd
+sql_query = """
+SELECT SUM(Survived) AS SurvivedMaleCount
+FROM table_aec7a6bd6f78cb97d53618ce510b61d8
+WHERE Sex = 'male'
+"""
+survived_male_count_df = execute_sql_query(sql_query)
+survived_male_count = survived_male_count_df['SurvivedMaleCount'].iloc[0]
+result = {'type': 'number', 'value': survived_male_count}
+2026-05-13 16:13:24 [INFO] Response generated successfully.
+2026-05-13 16:13:25 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-13 16:13:55 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-13 16:13:55 [INFO] Refined prompt: `df['Age'].isnull().sum()`
+2026-05-13 16:13:55 [INFO] Question: `df['Age'].isnull().sum()`
+2026-05-13 16:13:55 [INFO] Running PandasAI with openai LLM...
+2026-05-13 16:13:55 [INFO] Prompt ID: b4d07496-578f-42f7-8e9e-eaa32085ffec
+2026-05-13 16:13:55 [INFO] Generating new code...
+2026-05-13 16:13:55 [INFO] Using Prompt: <tables>
+
+<table dialect="duckdb" table_name="table_aec7a6bd6f78cb97d53618ce510b61d8" columns="[{"name": "PassengerId", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Survived", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Pclass", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Name", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Sex", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Age", "type": "float", "description": null, "expression": null, "alias": null}, {"name": "SibSp", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Parch", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Ticket", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Fare", "type": "float", "description": null, "expression": null, "alias": null}, {"name": "Cabin", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Embarked", "type": "string", "description": null, "expression": null, "alias": null}]" dimensions="891x12">
+PassengerId,Survived,Pclass,Name,Sex,Age,SibSp,Parch,Ticket,Fare,Cabin,Embarked
+1,0,3,"Braund, Mr. Owen Harris",male,22.0,1,0,A/5 21171,7.25,,S
+2,1,1,"Cumings, Mrs. John Bradley (Florence Briggs Thayer)",female,38.0,1,0,PC 17599,71.2833,C85,C
+3,1,3,"Heikkinen, Miss. Laina",female,26.0,0,0,STON/O2. 3101282,7.925,,S
+4,1,1,"Futrelle, Mrs. Jacques Heath (Lily May Peel)",female,35.0,1,0,113803,53.1,C123,S
+5,0,3,"Allen, Mr. William Henry",male,35.0,0,0,373450,8.05,,S
+</table>
+
+
+</tables>
+
+The following functions have already been provided. Please use them as needed and do not redefine them.
+<function>
+def execute_sql_query(sql_query: str) -> pd.DataFrame
+    """This method connects to the database, executes the sql query and returns the dataframe"""
+</function>
+
+
+
+Update this initial code:
+```python
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+
+# Declare result var: 
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+```
+
+
+
+### QUERY
+ `df['Age'].isnull().sum()`
+
+At the end, declare "result" variable as a dictionary of type and value in the following format:
+
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+
+
+Generate python code and return full updated code:
+
+### Note: Use only relevant table for query and do aggregation, sorting, joins and grouby through sql query
+2026-05-13 16:13:57 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-13 16:13:57 [INFO] Code Generated:
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+sql_query = """
+SELECT COUNT(*) AS missing_age_count
+FROM table_aec7a6bd6f78cb97d53618ce510b61d8
+WHERE Age IS NULL
+"""
+
+result_df = execute_sql_query(sql_query)
+
+# Declare result var:
+result = { "type": "number", "value": result_df['missing_age_count'].iloc[0] }
+2026-05-13 16:13:57 [INFO] Validating code requirements...
+2026-05-13 16:13:57 [INFO] Code validation successful.
+2026-05-13 16:13:57 [INFO] Cleaning the generated code...
+2026-05-13 16:13:57 [INFO] Executing code: import pandas as pd
+sql_query = """
+SELECT COUNT(*) AS missing_age_count
+FROM table_aec7a6bd6f78cb97d53618ce510b61d8
+WHERE Age IS NULL
+"""
+result_df = execute_sql_query(sql_query)
+result = {'type': 'number', 'value': result_df['missing_age_count'].iloc[0]}
+2026-05-13 16:13:57 [INFO] Response generated successfully.
+2026-05-13 16:13:58 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-13 16:15:12 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-13 16:15:12 [INFO] Refined prompt: Count the occurrences of 'Master' in the Name column and calculate the mean of the Survived column for those entries.
+2026-05-13 16:15:12 [INFO] Question: Count the occurrences of 'Master' in the Name column and calculate the mean of the Survived column for those entries.
+2026-05-13 16:15:12 [INFO] Running PandasAI with openai LLM...
+2026-05-13 16:15:12 [INFO] Prompt ID: ebd22578-e424-4404-ade1-c016cd054eaf
+2026-05-13 16:15:12 [INFO] Generating new code...
+2026-05-13 16:15:12 [INFO] Using Prompt: <tables>
+
+<table dialect="duckdb" table_name="table_aec7a6bd6f78cb97d53618ce510b61d8" columns="[{"name": "PassengerId", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Survived", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Pclass", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Name", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Sex", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Age", "type": "float", "description": null, "expression": null, "alias": null}, {"name": "SibSp", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Parch", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Ticket", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Fare", "type": "float", "description": null, "expression": null, "alias": null}, {"name": "Cabin", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Embarked", "type": "string", "description": null, "expression": null, "alias": null}]" dimensions="891x12">
+PassengerId,Survived,Pclass,Name,Sex,Age,SibSp,Parch,Ticket,Fare,Cabin,Embarked
+1,0,3,"Braund, Mr. Owen Harris",male,22.0,1,0,A/5 21171,7.25,,S
+2,1,1,"Cumings, Mrs. John Bradley (Florence Briggs Thayer)",female,38.0,1,0,PC 17599,71.2833,C85,C
+3,1,3,"Heikkinen, Miss. Laina",female,26.0,0,0,STON/O2. 3101282,7.925,,S
+4,1,1,"Futrelle, Mrs. Jacques Heath (Lily May Peel)",female,35.0,1,0,113803,53.1,C123,S
+5,0,3,"Allen, Mr. William Henry",male,35.0,0,0,373450,8.05,,S
+</table>
+
+
+</tables>
+
+The following functions have already been provided. Please use them as needed and do not redefine them.
+<function>
+def execute_sql_query(sql_query: str) -> pd.DataFrame
+    """This method connects to the database, executes the sql query and returns the dataframe"""
+</function>
+
+
+
+Update this initial code:
+```python
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+
+# Declare result var: 
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+```
+
+
+
+### QUERY
+ Count the occurrences of 'Master' in the Name column and calculate the mean of the Survived column for those entries.
+
+At the end, declare "result" variable as a dictionary of type and value in the following format:
+
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+
+
+Generate python code and return full updated code:
+
+### Note: Use only relevant table for query and do aggregation, sorting, joins and grouby through sql query
+2026-05-13 16:15:14 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-13 16:15:14 [INFO] Code Generated:
+# TODO: import the required dependencies
+import pandas as pd
+
+# SQL query construction
+sql_query = """
+SELECT COUNT(*) AS Master_Count, AVG(Survived) AS Mean_Survived
+FROM table_aec7a6bd6f78cb97d53618ce510b61d8
+WHERE Name LIKE '%Master%'
+"""
+
+# Execute the SQL query using the provided function
+result_df = execute_sql_query(sql_query)
+
+# Declare result var
+result = {
+    "type": "dataframe",
+    "value": result_df
+}
+2026-05-13 16:15:14 [INFO] Validating code requirements...
+2026-05-13 16:15:14 [INFO] Code validation successful.
+2026-05-13 16:15:14 [INFO] Cleaning the generated code...
+2026-05-13 16:15:14 [INFO] Executing code: import pandas as pd
+sql_query = """
+SELECT COUNT(*) AS Master_Count, AVG(Survived) AS Mean_Survived
+FROM table_aec7a6bd6f78cb97d53618ce510b61d8
+WHERE Name LIKE '%Master%'
+"""
+result_df = execute_sql_query(sql_query)
+result = {'type': 'dataframe', 'value': result_df}
+2026-05-13 16:15:14 [INFO] Response generated successfully.
+2026-05-13 16:15:16 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-13 16:15:31 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-13 16:15:31 [INFO] Refined prompt: - Passengers traveling alone (Family Size = 1) had a survival rate of 30.2%.
+- Passengers traveling in large families (Family Size > 4) had a survival rate of 16.2%.
+2026-05-13 16:15:31 [INFO] Question: - Passengers traveling alone (Family Size = 1) had a survival rate of 30.2%.
+- Passengers traveling in large families (Family Size > 4) had a survival rate of 16.2%.
+2026-05-13 16:15:31 [INFO] Running PandasAI with openai LLM...
+2026-05-13 16:15:31 [INFO] Prompt ID: 2b89cb4e-8fc9-4939-8dd5-6b4197c97b0f
+2026-05-13 16:15:31 [INFO] Generating new code...
+2026-05-13 16:15:31 [INFO] Using Prompt: <tables>
+
+<table dialect="duckdb" table_name="table_aec7a6bd6f78cb97d53618ce510b61d8" columns="[{"name": "PassengerId", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Survived", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Pclass", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Name", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Sex", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Age", "type": "float", "description": null, "expression": null, "alias": null}, {"name": "SibSp", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Parch", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Ticket", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Fare", "type": "float", "description": null, "expression": null, "alias": null}, {"name": "Cabin", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Embarked", "type": "string", "description": null, "expression": null, "alias": null}]" dimensions="891x12">
+PassengerId,Survived,Pclass,Name,Sex,Age,SibSp,Parch,Ticket,Fare,Cabin,Embarked
+1,0,3,"Braund, Mr. Owen Harris",male,22.0,1,0,A/5 21171,7.25,,S
+2,1,1,"Cumings, Mrs. John Bradley (Florence Briggs Thayer)",female,38.0,1,0,PC 17599,71.2833,C85,C
+3,1,3,"Heikkinen, Miss. Laina",female,26.0,0,0,STON/O2. 3101282,7.925,,S
+4,1,1,"Futrelle, Mrs. Jacques Heath (Lily May Peel)",female,35.0,1,0,113803,53.1,C123,S
+5,0,3,"Allen, Mr. William Henry",male,35.0,0,0,373450,8.05,,S
+</table>
+
+
+</tables>
+
+The following functions have already been provided. Please use them as needed and do not redefine them.
+<function>
+def execute_sql_query(sql_query: str) -> pd.DataFrame
+    """This method connects to the database, executes the sql query and returns the dataframe"""
+</function>
+
+
+
+Update this initial code:
+```python
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+
+# Declare result var: 
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+```
+
+
+
+### QUERY
+ - Passengers traveling alone (Family Size = 1) had a survival rate of 30.2%.
+- Passengers traveling in large families (Family Size > 4) had a survival rate of 16.2%.
+
+At the end, declare "result" variable as a dictionary of type and value in the following format:
+
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+
+
+Generate python code and return full updated code:
+
+### Note: Use only relevant table for query and do aggregation, sorting, joins and grouby through sql query
+2026-05-13 16:15:36 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-13 16:15:36 [INFO] Code Generated:
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+query = """
+    WITH FamilySize AS (
+        SELECT *,
+               (SibSp + Parch + 1) AS family_size
+        FROM table_aec7a6bd6f78cb97d53618ce510b61d8
+    ),
+    SurvivalRates AS (
+        SELECT
+            CASE
+                WHEN family_size = 1 THEN 'Alone'
+                WHEN family_size > 4 THEN 'Large Family'
+                ELSE 'Other'
+            END AS group_type,
+            AVG(Survived) * 100 AS survival_rate
+        FROM FamilySize
+        GROUP BY 1
+    )
+    SELECT *
+    FROM SurvivalRates
+    WHERE group_type IN ('Alone', 'Large Family')
+"""
+
+# Execute the query
+result_df = execute_sql_query(query)
+
+# Declare result var
+result = { "type": "dataframe", "value": result_df }
+2026-05-13 16:15:36 [INFO] Validating code requirements...
+2026-05-13 16:15:36 [INFO] Code validation successful.
+2026-05-13 16:15:36 [INFO] Cleaning the generated code...
+2026-05-13 16:15:36 [INFO] Executing code: import pandas as pd
+query = """
+    WITH FamilySize AS (
+        SELECT *,
+               (SibSp + Parch + 1) AS family_size
+        FROM table_aec7a6bd6f78cb97d53618ce510b61d8
+    ),
+    SurvivalRates AS (
+        SELECT
+            CASE
+                WHEN family_size = 1 THEN 'Alone'
+                WHEN family_size > 4 THEN 'Large Family'
+                ELSE 'Other'
+            END AS group_type,
+            AVG(Survived) * 100 AS survival_rate
+        FROM FamilySize
+        GROUP BY 1
+    )
+    SELECT *
+    FROM SurvivalRates
+    WHERE group_type IN ('Alone', 'Large Family')
+"""
+result_df = execute_sql_query(query)
+result = {'type': 'dataframe', 'value': result_df}
+2026-05-13 16:15:36 [INFO] Response generated successfully.
+2026-05-13 16:15:37 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"

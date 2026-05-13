@@ -66,10 +66,6 @@ export default function HistoryPanel({ isOpen, onClose, onReuse }: Props) {
     }
   }
 
-  const handleSelectFromList = (index: number) => {
-    setCurrentIndex(index)
-  }
-
   const handleReuse = () => {
     if (currentPrompt) {
       onReuse(currentPrompt.question)
@@ -181,27 +177,6 @@ export default function HistoryPanel({ isOpen, onClose, onReuse }: Props) {
     flexShrink: 0,
   }
 
-  const historyListStyle: React.CSSProperties = {
-    maxHeight: 160,
-    overflowY: 'auto',
-    border: '1px solid #e0e0e0',
-    borderRadius: 6,
-    flexShrink: 0,
-  }
-
-  const historyItemStyle = (isSelected: boolean): React.CSSProperties => ({
-    padding: '8px 12px',
-    fontSize: 12,
-    borderBottom: '1px solid #f0f0f0',
-    cursor: 'pointer',
-    backgroundColor: isSelected ? '#e3f2fd' : '#fff',
-    color: isSelected ? '#2563eb' : '#333',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
-    transition: 'background-color 0.2s',
-  })
-
   return (
     <div style={panelStyle}>
       {/* Header */}
@@ -285,24 +260,6 @@ export default function HistoryPanel({ isOpen, onClose, onReuse }: Props) {
             >
               Re-use
             </button>
-
-            {/* History list */}
-            {totalCount > 0 && (
-              <div style={{ marginTop: 12 }}>
-                <div style={historyListStyle}>
-                  {history.map((item, idx) => (
-                    <div
-                      key={item.id}
-                      onClick={() => handleSelectFromList(idx)}
-                      style={historyItemStyle(idx === currentIndex)}
-                      title={item.question}
-                    >
-                      {item.question} • {formatRelativeTime(item.created_at)}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </>
         )}
       </div>
