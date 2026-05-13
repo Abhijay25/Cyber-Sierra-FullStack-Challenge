@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Cookie, Depends, status
+from fastapi import APIRouter, Cookie, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
@@ -51,7 +51,11 @@ async def submit_feedback(
     # Update feedback and comment
     prompt.feedback = request.feedback
     prompt.comment = request.comment
-    db.commit()
+    try:
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Failed to save feedback")
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,

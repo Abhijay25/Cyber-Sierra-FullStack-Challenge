@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+import os
+from pathlib import Path
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 from sqlalchemy.pool import StaticPool
 
-DATABASE_URL = "sqlite:///./mydatabase.db"
+BASE_DIR = Path(__file__).resolve().parent.parent
+DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{BASE_DIR}/mydatabase.db")
 
 engine = create_engine(
     DATABASE_URL,

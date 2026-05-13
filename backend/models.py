@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Literal
 
 from pydantic import BaseModel
@@ -27,7 +27,7 @@ class Prompt(Base):
     feedback: Mapped[str | None] = mapped_column(String(10), nullable=True)
     comment: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
-        nullable=False, default=datetime.utcnow
+        nullable=False, default=lambda: datetime.now(timezone.utc)
     )
 
 
@@ -37,7 +37,7 @@ class Session(Base):
     session_id: Mapped[str] = mapped_column(String(255), primary_key=True)
     preferences_md: Mapped[str] = mapped_column(Text, default="", nullable=False)
     created_at: Mapped[datetime] = mapped_column(
-        nullable=False, default=datetime.utcnow
+        nullable=False, default=lambda: datetime.now(timezone.utc)
     )
 
 
