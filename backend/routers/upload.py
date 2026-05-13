@@ -5,7 +5,7 @@ from io import BytesIO
 from pathlib import Path
 
 import pandas as pd
-from fastapi import APIRouter, UploadFile, status
+from fastapi import APIRouter, Cookie, UploadFile, status
 from fastapi.responses import JSONResponse
 
 from services import session_store
@@ -23,7 +23,10 @@ MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
 
 
 @router.post("/upload")
-async def upload(files: list[UploadFile]) -> JSONResponse:
+async def upload(
+    files: list[UploadFile],
+    session_id: str | None = Cookie(default=None),
+) -> JSONResponse:
     """
     Upload CSV or Excel files and store them in the session.
 
@@ -94,14 +97,14 @@ async def upload(files: list[UploadFile]) -> JSONResponse:
                 content={"detail": f"Failed to parse file: {str(e)}"},
             )
 
-    # Get or create session_id
-    session_id = str(uuid.uuid4())
+    # Use existing session_id if present, otherwise generate new one
+    sid = session_id if session_id else str(uuid.uuid4())
 
     # Store sheets in session
-    session_store.set_sheets(session_id, parsed_sheets)
+    session_store.set_sheets(sid, parsed_sheets)
 
     # Get sheet metadata
-    meta = session_store.get_sheet_meta(session_id)
+    meta = session_store.get_sheet_meta(sid)
 
     # Build response with cookie
     response = JSONResponse(
@@ -112,7 +115,7 @@ async def upload(files: list[UploadFile]) -> JSONResponse:
     # Set session_id cookie
     response.set_cookie(
         key="session_id",
-        value=session_id,
+        value=sid,
         httponly=True,
         samesite="lax",
         path="/",
