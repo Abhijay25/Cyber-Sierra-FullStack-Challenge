@@ -37,9 +37,10 @@ def get_sheet_meta(session_id: str) -> list[dict]:
 
     meta = []
     for sheet_name, df in sheets.items():
+        # Fix D: Cast column names to strings
         meta.append({
             "name": sheet_name,
             "row_count": len(df),
-            "columns": df.columns.tolist(),
+            "columns": [str(c) for c in df.columns],
         })
     return meta

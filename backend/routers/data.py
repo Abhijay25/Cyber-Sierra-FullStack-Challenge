@@ -70,7 +70,8 @@ async def get_data(
 
     # Get first n rows as dicts
     rows = df.head(n).to_dict(orient="records")
-    columns = df.columns.tolist()
+    # Fix D: Cast column names to strings
+    columns = [str(c) for c in df.columns]
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,

@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+import re
 import uuid
 from io import BytesIO
 from pathlib import Path
 
 import pandas as pd
-from fastapi import APIRouter, Cookie, UploadFile, status
+from fastapi import APIRouter, Cookie, HTTPException, UploadFile, status
 from fastapi.responses import JSONResponse
 
 from services import session_store
@@ -39,6 +40,13 @@ async def upload(
     Returns sheet metadata (name, row_count, columns).
     Sets session_id cookie if not present.
     """
+    # Fix A: Check file count limit
+    if len(files) > 10:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Maximum 10 files per upload",
+        )
+
     parsed_sheets: dict[str, pd.DataFrame] = {}
 
     for file in files:
@@ -69,6 +77,13 @@ async def upload(
         # Read file content
         content = await file.read()
 
+        # Fix B: Check for empty files
+        if not content:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"File '{file.filename}' is empty",
+            )
+
         # Validate file size
         if len(content) > MAX_FILE_SIZE:
             return JSONResponse(
@@ -81,15 +96,17 @@ async def upload(
 
         # Parse file
         filename_without_ext = file_path.stem
+        # Fix C: Sanitize filename
+        safe_name = re.sub(r'[^a-zA-Z0-9_\-.]', '_', filename_without_ext)
 
         try:
             if file_ext == ".csv":
                 df = pd.read_csv(BytesIO(content))
-                parsed_sheets[filename_without_ext] = df
+                parsed_sheets[safe_name] = df
             else:  # .xls or .xlsx
                 xls = pd.read_excel(BytesIO(content), sheet_name=None)
                 for sheet_name, df in xls.items():
-                    key = f"{filename_without_ext}/{sheet_name}"
+                    key = f"{safe_name}/{sheet_name}"
                     parsed_sheets[key] = df
         except Exception as e:
             return JSONResponse(
