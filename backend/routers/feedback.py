@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import logging
+
 from fastapi import APIRouter, Cookie, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
@@ -7,6 +9,8 @@ from sqlalchemy.orm import Session
 from models import FeedbackRequest, Prompt, Session as SessionModel
 from services.ai_pipeline import update_preferences
 from services.db import get_db
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api", tags=["feedback"])
 
@@ -66,7 +70,11 @@ async def submit_feedback(
             .first()
         )
         current_prefs = session_row.preferences_md if session_row is not None else ""
-        await update_preferences(session_id, request.comment, current_prefs, db)
+        try:
+            await update_preferences(session_id, request.comment, current_prefs, db)
+        except Exception:
+            logger.exception("Failed to update preferences")
+            # Don't re-raise — feedback was already saved successfully
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,

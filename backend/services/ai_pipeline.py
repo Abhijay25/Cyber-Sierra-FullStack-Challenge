@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 import os
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
 import openai
 import pandas as pd
@@ -11,7 +12,20 @@ from sqlalchemy.orm import Session as DBSession
 
 load_dotenv()
 
-OPENAI_API_KEY: str = os.environ.get("OPENAI_API_KEY", "")
+OPENAI_API_KEY: str = os.environ.get("OPENAI_API_KEY") or ""
+if not OPENAI_API_KEY:
+    raise RuntimeError("OPENAI_API_KEY environment variable is not set")
+
+logger = logging.getLogger(__name__)
+
+_async_client: openai.AsyncOpenAI | None = None
+
+
+def _get_async_client() -> openai.AsyncOpenAI:
+    global _async_client
+    if _async_client is None:
+        _async_client = openai.AsyncOpenAI(api_key=OPENAI_API_KEY, timeout=30.0)
+    return _async_client
 
 # ---------------------------------------------------------------------------
 # PandasAI v3 custom LLM adapter (synchronous, wraps openai.OpenAI)
@@ -62,8 +76,7 @@ async def _openai_rewrite(question: str, columns: list[str], preferences_md: str
         f"Return ONLY the rewritten instruction, nothing else."
         f"{prefs_section}"
     )
-    client = openai.AsyncOpenAI(api_key=OPENAI_API_KEY)
-    response = await client.chat.completions.create(
+    response = await _get_async_client().chat.completions.create(
         model="gpt-4o",
         messages=[
             {"role": "system", "content": system_prompt},
@@ -78,20 +91,17 @@ async def _openai_rewrite(question: str, columns: list[str], preferences_md: str
 def _run_pandasai(df: pd.DataFrame, prompt: str) -> str:
     """Run PandasAI Agent synchronously. Called via asyncio.to_thread."""
     from pandasai import Agent
-    from pandasai.config import ConfigManager
 
     llm = _OpenAIAdapter(api_key=OPENAI_API_KEY)
-    ConfigManager.update({"llm": llm})
-    agent = Agent([df])
+    agent = Agent([df], config={"llm": llm})
     result = agent.chat(prompt)
     return str(result)
 
 
 async def _simplify_prompt(question: str, columns: list[str]) -> str:
     """Cheap OpenAI call to strip conversational framing into a direct computation."""
-    client = openai.AsyncOpenAI(api_key=OPENAI_API_KEY)
     col_str = ", ".join(columns)
-    response = await client.chat.completions.create(
+    response = await _get_async_client().chat.completions.create(
         model="gpt-4o",
         messages=[
             {
@@ -109,13 +119,14 @@ async def _simplify_prompt(question: str, columns: list[str]) -> str:
 
 
 async def _openai_context_stuffing(
-    question: str, df: pd.DataFrame, preferences_md: str
+    prompt: str, df: pd.DataFrame, preferences_md: str
 ) -> str:
     """Step 3a: Send top-100 rows as CSV to OpenAI when PandasAI fails on small DF."""
     csv_str = df.head(100).to_csv(index=False)
+    # Truncate to max 8000 chars to stay within token limits
+    csv_str = csv_str[:8000]
     prefs_section = f"\nUser preferences:\n{preferences_md}" if preferences_md else ""
-    client = openai.AsyncOpenAI(api_key=OPENAI_API_KEY)
-    response = await client.chat.completions.create(
+    response = await _get_async_client().chat.completions.create(
         model="gpt-4o",
         messages=[
             {
@@ -127,7 +138,7 @@ async def _openai_context_stuffing(
             },
             {
                 "role": "user",
-                "content": f"Data:\n{csv_str}\n\nQuestion: {question}",
+                "content": f"Data:\n{csv_str}\n\nQuestion: {prompt}",
             },
         ],
         max_tokens=500,
@@ -139,8 +150,7 @@ async def _openai_context_stuffing(
 async def _openai_format(raw_result: str, question: str, preferences_md: str) -> str:
     """Step 2.5: Format the raw result into a clear, concise answer."""
     prefs_section = f" {preferences_md}" if preferences_md else ""
-    client = openai.AsyncOpenAI(api_key=OPENAI_API_KEY)
-    response = await client.chat.completions.create(
+    response = await _get_async_client().chat.completions.create(
         model="gpt-4o",
         messages=[
             {
@@ -183,16 +193,18 @@ async def run_pipeline(
     try:
         raw_result = await asyncio.to_thread(_run_pandasai, df, refined_prompt)
     except Exception:
+        logger.exception("PandasAI failed")
         # Fallback logic
         if len(df) <= 100:
             # Step 3a: context stuffing
-            raw_result = await _openai_context_stuffing(question, df, preferences_md)
+            raw_result = await _openai_context_stuffing(refined_prompt, df, preferences_md)
         else:
             # Step 3b: retry with simplified prompt
             simplified = await _simplify_prompt(question, columns)
             try:
                 raw_result = await asyncio.to_thread(_run_pandasai, df, simplified)
             except Exception:
+                logger.exception("PandasAI failed on simplified prompt")
                 return refined_prompt, "Could not compute an answer for this question."
 
     # Step 2.5 — Formatting pass
@@ -212,8 +224,7 @@ async def update_preferences(
     """
     from models import Session as SessionModel
 
-    client = openai.AsyncOpenAI(api_key=OPENAI_API_KEY)
-    response = await client.chat.completions.create(
+    response = await _get_async_client().chat.completions.create(
         model="gpt-4o",
         messages=[
             {
