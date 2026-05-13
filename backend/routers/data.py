@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 
 from services import session_store
 
-router = APIRouter(prefix="/api", tags=["data"])
+router = APIRouter(tags=["data"])
 
 
 @router.get("/sheets")

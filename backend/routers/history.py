@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from models import Prompt
 from services.db import get_db
 
-router = APIRouter(prefix="/api", tags=["history"])
+router = APIRouter(tags=["history"])
 
 
 @router.get("/history")

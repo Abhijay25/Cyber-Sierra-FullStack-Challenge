@@ -8,7 +8,7 @@ from services.ai_pipeline import run_pipeline
 from services.db import get_db
 from services.session_store import get_sheet
 
-router = APIRouter(prefix="/api", tags=["query"])
+router = APIRouter(tags=["query"])
 
 
 @router.post("/query", response_model=QueryResponse)

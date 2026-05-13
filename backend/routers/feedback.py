@@ -12,7 +12,7 @@ from services.db import get_db
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/api", tags=["feedback"])
+router = APIRouter(tags=["feedback"])
 
 
 @router.post("/feedback")

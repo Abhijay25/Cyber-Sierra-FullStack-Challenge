@@ -11,7 +11,7 @@ from fastapi.responses import JSONResponse
 
 from services import session_store
 
-router = APIRouter(prefix="/api", tags=["upload"])
+router = APIRouter(tags=["upload"])
 
 # Allowed file extensions and MIME types
 ALLOWED_EXTENSIONS = {".csv", ".xls", ".xlsx"}
