@@ -55,7 +55,7 @@ class _OpenAIAdapter(LLM):
         response = self._client.chat.completions.create(
             model=self._model,
             messages=[{"role": "user", "content": prompt_text}],
-            max_tokens=500,
+            max_tokens=1000,
         )
         content = response.choices[0].message.content
         return content if content is not None else ""
@@ -76,10 +76,15 @@ async def _openai_rewrite(
     column_list = ", ".join(columns)
     prefs_section = f"\nUser preferences to apply:\n{preferences_md}" if preferences_md else ""
     system_prompt = (
-        f"You are a data analysis assistant. Rewrite the user's question as a precise, "
-        f"pandas-friendly instruction for a DataFrame with columns: {column_list}.\n"
-        f"Return ONLY the rewritten instruction, nothing else. "
-        f"Use prior conversation turns to resolve references like 'that', 'it', 'those'."
+        f"You are a data analysis assistant. Convert the user's question into a minimal, "
+        f"precise pandas instruction for a DataFrame with columns: {column_list}.\n"
+        f"Rules:\n"
+        f"- Name the exact column(s) to use.\n"
+        f"- Specify the exact operation (mean, count, sum, value_counts, etc.).\n"
+        f"- If the answer is a single number, say 'return a single scalar value'.\n"
+        f"- Do NOT add distributions, groupings, or percentages unless the user explicitly asked.\n"
+        f"- Use prior conversation turns only to resolve pronouns like 'that', 'it', 'those'.\n"
+        f"Return ONLY the instruction, no code, no explanation."
         f"{prefs_section}"
     )
     messages: list[dict[str, str]] = [{"role": "system", "content": system_prompt}]
@@ -208,6 +213,7 @@ async def run_pipeline(
 
     # Step 1 — Reformulate question via OpenAI (with conversation context)
     refined_prompt = await _openai_rewrite(question, columns, preferences_md, hist)
+    logger.info("Refined prompt: %s", refined_prompt)
 
     # Step 2 — PandasAI execution (sync, wrapped in thread)
     raw_result: Optional[str] = None

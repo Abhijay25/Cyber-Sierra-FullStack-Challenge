@@ -627,3 +627,241 @@ max_fare = df['MaxFare'].iloc[0]
 result = {'type': 'number', 'value': max_fare}
 2026-05-13 16:00:45 [INFO] Response generated successfully.
 2026-05-13 16:00:46 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-13 16:05:29 [INFO] Question: Calculate the average age from the 'Age' column and present it as a percentage breakdown of different age brackets (e.g., 0-10, 11-20, etc.).
+2026-05-13 16:05:29 [INFO] Running PandasAI with openai LLM...
+2026-05-13 16:05:29 [INFO] Prompt ID: be489c08-5687-4806-8824-434111667eed
+2026-05-13 16:05:29 [INFO] Generating new code...
+2026-05-13 16:05:29 [INFO] Using Prompt: <tables>
+
+<table dialect="duckdb" table_name="table_aec7a6bd6f78cb97d53618ce510b61d8" columns="[{"name": "PassengerId", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Survived", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Pclass", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Name", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Sex", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Age", "type": "float", "description": null, "expression": null, "alias": null}, {"name": "SibSp", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Parch", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Ticket", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Fare", "type": "float", "description": null, "expression": null, "alias": null}, {"name": "Cabin", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Embarked", "type": "string", "description": null, "expression": null, "alias": null}]" dimensions="891x12">
+PassengerId,Survived,Pclass,Name,Sex,Age,SibSp,Parch,Ticket,Fare,Cabin,Embarked
+1,0,3,"Braund, Mr. Owen Harris",male,22.0,1,0,A/5 21171,7.25,,S
+2,1,1,"Cumings, Mrs. John Bradley (Florence Briggs Thayer)",female,38.0,1,0,PC 17599,71.2833,C85,C
+3,1,3,"Heikkinen, Miss. Laina",female,26.0,0,0,STON/O2. 3101282,7.925,,S
+4,1,1,"Futrelle, Mrs. Jacques Heath (Lily May Peel)",female,35.0,1,0,113803,53.1,C123,S
+5,0,3,"Allen, Mr. William Henry",male,35.0,0,0,373450,8.05,,S
+</table>
+
+
+</tables>
+
+The following functions have already been provided. Please use them as needed and do not redefine them.
+<function>
+def execute_sql_query(sql_query: str) -> pd.DataFrame
+    """This method connects to the database, executes the sql query and returns the dataframe"""
+</function>
+
+
+
+Update this initial code:
+```python
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+
+# Declare result var: 
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+```
+
+
+
+### QUERY
+ Calculate the average age from the 'Age' column and present it as a percentage breakdown of different age brackets (e.g., 0-10, 11-20, etc.).
+
+At the end, declare "result" variable as a dictionary of type and value in the following format:
+
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+
+
+Generate python code and return full updated code:
+
+### Note: Use only relevant table for query and do aggregation, sorting, joins and grouby through sql query
+2026-05-13 16:05:33 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-13 16:05:33 [INFO] Code Generated:
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+# SQL query to calculate the percentage breakdown of different age brackets
+sql_query = """
+    SELECT 
+        CASE 
+            WHEN Age BETWEEN 0 AND 10 THEN '0-10'
+            WHEN Age BETWEEN 11 AND 20 THEN '11-20'
+            WHEN Age BETWEEN 21 AND 30 THEN '21-30'
+            WHEN Age BETWEEN 31 AND 40 THEN '31-40'
+            WHEN Age BETWEEN 41 AND 50 THEN '41-50'
+            WHEN Age BETWEEN 51 AND 60 THEN '51-60'
+            WHEN Age BETWEEN 61 AND 70 THEN '61-70'
+            WHEN Age BETWEEN 71 AND 80 THEN '71-80'
+            ELSE '80+' 
+        END AS AgeBracket,
+        COUNT(*) AS Count,
+        ROUND((COUNT(*) * 1.0 / (SELECT COUNT(*) FROM table_aec7a6bd6f78cb97d53618ce510b61d8 WHERE Age IS NOT NULL) * 100), 2) AS Percentage
+    FROM table_aec7a6bd6f78cb97d53618ce510b61d8
+    WHERE Age IS NOT NULL
+    GROUP BY AgeBracket
+    ORDER BY AgeBracket
+"""
+
+# Execute the SQL query
+age_bracket_df = execute_sql_query(sql_query)
+
+# Declare result variable as a dictionary of type and value
+result = { "type": "dataframe", "value": age_bracket_df }
+2026-05-13 16:05:33 [INFO] Validating code requirements...
+2026-05-13 16:05:33 [INFO] Code validation successful.
+2026-05-13 16:05:33 [INFO] Cleaning the generated code...
+2026-05-13 16:05:33 [INFO] Executing code: import pandas as pd
+sql_query = """
+    SELECT 
+        CASE 
+            WHEN Age BETWEEN 0 AND 10 THEN '0-10'
+            WHEN Age BETWEEN 11 AND 20 THEN '11-20'
+            WHEN Age BETWEEN 21 AND 30 THEN '21-30'
+            WHEN Age BETWEEN 31 AND 40 THEN '31-40'
+            WHEN Age BETWEEN 41 AND 50 THEN '41-50'
+            WHEN Age BETWEEN 51 AND 60 THEN '51-60'
+            WHEN Age BETWEEN 61 AND 70 THEN '61-70'
+            WHEN Age BETWEEN 71 AND 80 THEN '71-80'
+            ELSE '80+' 
+        END AS AgeBracket,
+        COUNT(*) AS Count,
+        ROUND((COUNT(*) * 1.0 / (SELECT COUNT(*) FROM table_aec7a6bd6f78cb97d53618ce510b61d8 WHERE Age IS NOT NULL) * 100), 2) AS Percentage
+    FROM table_aec7a6bd6f78cb97d53618ce510b61d8
+    WHERE Age IS NOT NULL
+    GROUP BY AgeBracket
+    ORDER BY AgeBracket
+"""
+age_bracket_df = execute_sql_query(sql_query)
+result = {'type': 'dataframe', 'value': age_bracket_df}
+2026-05-13 16:05:33 [INFO] Response generated successfully.
+2026-05-13 16:05:35 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-13 16:06:08 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-13 16:06:08 [INFO] Question: Calculate the average age from the 'Age' column and provide the percentage of people in each age range.
+2026-05-13 16:06:08 [INFO] Running PandasAI with openai LLM...
+2026-05-13 16:06:08 [INFO] Prompt ID: 1cc45bbc-d217-4f0b-836c-60677f38e9f1
+2026-05-13 16:06:08 [INFO] Generating new code...
+2026-05-13 16:06:08 [INFO] Using Prompt: <tables>
+
+<table dialect="duckdb" table_name="table_aec7a6bd6f78cb97d53618ce510b61d8" columns="[{"name": "PassengerId", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Survived", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Pclass", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Name", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Sex", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Age", "type": "float", "description": null, "expression": null, "alias": null}, {"name": "SibSp", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Parch", "type": "integer", "description": null, "expression": null, "alias": null}, {"name": "Ticket", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Fare", "type": "float", "description": null, "expression": null, "alias": null}, {"name": "Cabin", "type": "string", "description": null, "expression": null, "alias": null}, {"name": "Embarked", "type": "string", "description": null, "expression": null, "alias": null}]" dimensions="891x12">
+PassengerId,Survived,Pclass,Name,Sex,Age,SibSp,Parch,Ticket,Fare,Cabin,Embarked
+1,0,3,"Braund, Mr. Owen Harris",male,22.0,1,0,A/5 21171,7.25,,S
+2,1,1,"Cumings, Mrs. John Bradley (Florence Briggs Thayer)",female,38.0,1,0,PC 17599,71.2833,C85,C
+3,1,3,"Heikkinen, Miss. Laina",female,26.0,0,0,STON/O2. 3101282,7.925,,S
+4,1,1,"Futrelle, Mrs. Jacques Heath (Lily May Peel)",female,35.0,1,0,113803,53.1,C123,S
+5,0,3,"Allen, Mr. William Henry",male,35.0,0,0,373450,8.05,,S
+</table>
+
+
+</tables>
+
+The following functions have already been provided. Please use them as needed and do not redefine them.
+<function>
+def execute_sql_query(sql_query: str) -> pd.DataFrame
+    """This method connects to the database, executes the sql query and returns the dataframe"""
+</function>
+
+
+
+Update this initial code:
+```python
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+
+# Declare result var: 
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+```
+
+
+
+### QUERY
+ Calculate the average age from the 'Age' column and provide the percentage of people in each age range.
+
+At the end, declare "result" variable as a dictionary of type and value in the following format:
+
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+
+
+Generate python code and return full updated code:
+
+### Note: Use only relevant table for query and do aggregation, sorting, joins and grouby through sql query
+2026-05-13 16:06:11 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-13 16:06:11 [INFO] Code Generated:
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+
+# Calculate the average age and percentage of people in each age range
+sql_query = """
+WITH AgeStats AS (
+    SELECT 
+        AVG(Age) AS average_age,
+        CASE
+            WHEN Age < 18 THEN 'Under 18'
+            WHEN Age BETWEEN 18 AND 35 THEN '18-35'
+            WHEN Age BETWEEN 36 AND 55 THEN '36-55'
+            ELSE '56 and above'
+        END AS Age_Group,
+        COUNT(*) AS count
+    FROM table_aec7a6bd6f78cb97d53618ce510b61d8
+    WHERE Age IS NOT NULL
+    GROUP BY Age_Group
+),
+TotalCount AS (
+    SELECT SUM(count) AS total_count FROM AgeStats
+)
+SELECT 
+    AgeStats.Age_Group,
+    AgeStats.count,
+    (AgeStats.count / TotalCount.total_count) * 100 AS percentage
+FROM 
+    AgeStats, TotalCount
+"""
+
+# Execute the SQL query
+age_stats_df = execute_sql_query(sql_query)
+
+# Declare result var:
+result = { "type": "dataframe", "value": age_stats_df }
+2026-05-13 16:06:11 [INFO] Validating code requirements...
+2026-05-13 16:06:11 [INFO] Code validation successful.
+2026-05-13 16:06:11 [INFO] Cleaning the generated code...
+2026-05-13 16:06:11 [INFO] Executing code: import pandas as pd
+sql_query = """
+WITH AgeStats AS (
+    SELECT 
+        AVG(Age) AS average_age,
+        CASE
+            WHEN Age < 18 THEN 'Under 18'
+            WHEN Age BETWEEN 18 AND 35 THEN '18-35'
+            WHEN Age BETWEEN 36 AND 55 THEN '36-55'
+            ELSE '56 and above'
+        END AS Age_Group,
+        COUNT(*) AS count
+    FROM table_aec7a6bd6f78cb97d53618ce510b61d8
+    WHERE Age IS NOT NULL
+    GROUP BY Age_Group
+),
+TotalCount AS (
+    SELECT SUM(count) AS total_count FROM AgeStats
+)
+SELECT 
+    AgeStats.Age_Group,
+    AgeStats.count,
+    (AgeStats.count / TotalCount.total_count) * 100 AS percentage
+FROM 
+    AgeStats, TotalCount
+"""
+age_stats_df = execute_sql_query(sql_query)
+result = {'type': 'dataframe', 'value': age_stats_df}
+2026-05-13 16:06:11 [INFO] Response generated successfully.
+2026-05-13 16:06:13 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
