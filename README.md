@@ -78,6 +78,7 @@ Browser
 - Feedback endpoint verifies prompt ownership before updating
 - Query endpoint rate-limited to 20 requests/minute per IP
 - Query undergoes basic sanitisation; further protection via OpenAI's built-in content guardrails
+- **Relevance gate**: the rewrite step (GPT-4o) checks whether the question can be answered from the uploaded dataset's columns before running PandasAI. Off-topic questions (e.g. "capital of France?") and references to non-existent columns (e.g. "average salary") are rejected with a clear explanation rather than hallucinated answers or silent column remapping
 - `@tanstack/react-table` was audited against the May 11 2026 Shai-Hulud npm supply chain attack (CVE-2026-45321) — the `@tanstack/table*` family was confirmed clean; only the router/start ecosystem was compromised
 
 ## Production deployment
