@@ -14,4 +14,11 @@ routers/upload.py
 services/__init__.py
 services/ai_pipeline.py
 services/db.py
+services/limiter.py
 services/session_store.py
+tests/test_data.py
+tests/test_feedback.py
+tests/test_history.py
+tests/test_pipeline.py
+tests/test_query.py
+tests/test_upload.py

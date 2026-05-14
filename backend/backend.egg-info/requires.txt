@@ -8,3 +8,7 @@ python-multipart>=0.0.28
 slowapi>=0.1.9
 sqlalchemy>=2.0.49
 uvicorn[standard]>=0.46.0
+
+[dev]
+pytest>=8.0
+httpx>=0.28

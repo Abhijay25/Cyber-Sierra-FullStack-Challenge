@@ -107,3 +107,14 @@ make start
 ```
 
 FastAPI serves both the API and the built Next.js frontend from the same origin — no CORS configuration needed.
+
+## Running tests
+
+```bash
+cd backend
+LD_LIBRARY_PATH=$(nix-shell -p zlib gcc.lib --run 'echo $LD_LIBRARY_PATH' 2>/dev/null || \
+  echo "/nix/store/si4q3zks5mn5jhzzyri9hhd3cv789vlm-gcc-15.2.0-lib/lib:/nix/store/ri9paa3mri4kqakljak8ldvbcp7lpmif-zlib-1.3.1/lib") \
+  uv run pytest tests/ -v
+```
+
+On non-NixOS systems simply `cd backend && uv run pytest tests/ -v`.
